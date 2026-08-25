@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= movie.title %></title>
+    <style>
+        body { background: #141414; color: #fff; padding: 20px; text-align: center; font-family: sans-serif; }
+        .back-btn { display: inline-block; color: #f1c40f; text-decoration: none; margin-bottom: 15px; font-weight: bold; }
+        .player-box { width: 80%; max-width: 900px; height: 450px; margin: 0 auto; background: #000; border-radius: 8px; overflow: hidden; }
+        iframe, video { width: 100%; height: 100%; border: none; }
+        .server-container { margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .server-btn { padding: 10px 15px; background: #f1c40f; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .server-btn:hover { background: #d4ac0d; }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="back-btn">← Home Page</a>
+    <h2><%= movie.title %></h2>
+
+    <!-- Dynamic Player Container -->
+    <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
+        <div class="player-box" id="playerBox"></div>
+
+        <!-- Dynamic Server Buttons -->
+        <div class="server-container">
+            <% movie.videoLinks.forEach((link, index) => { %>
+                <button class="server-btn" onclick="playMedia('<%= link.url %>')">
+                    <%= link.name || 'Server ' + (index + 1) %>
+                </button>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p style="margin-top: 30px;">কোন ভিডিও লিংক পাওয়া যায়নি!</p>
+    <% } %>
+
+    <script>
+        // YouTube, Google Drive & Direct File Auto Formatting
+        function getCleanUrl(url) {
+            if (!url) return '';
+            
+            // Iframe Tag Paste handling
+            if (url.includes('<iframe')) {
+                const match = url.match(/src=["']([^"']+)["']/);
+                if (match) url = match[1];
+            }
+
+            // YouTube Links
+            if (url.includes('youtube.com/watch?v=')) {
+                return url.replace('watch?v=', 'embed/');
+            }
+            if (url.includes('youtu.be/')) {
+                return url.replace('youtu.be/', 'youtube.com/embed/');
+            }
+
+            // Google Drive Links
+            if (url.includes('drive.google.com') && url.includes('/view')) {
+                return url.replace('/view', '/preview');
+            }
+
+            return url;
+        }
+
+        function playMedia(rawUrl) {
+            const box = document.getElementById('playerBox');
+            if (!box) return;
+
+            const cleanUrl = getCleanUrl(rawUrl);
+
+            // Directly play MP4 / MKV files, otherwise use iframe
+            if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.mkv')) {
+                box.innerHTML = `<video controls autoplay><source src="${cleanUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
+            } else {
+                box.innerHTML = `<iframe src="${cleanUrl}" allowfullscreen allow="autoplay"></iframe>`;
+            }
+        }
+
+        // Auto play the first server link on load
+        <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
+            playMedia("<%= movie.videoLinks[0].url %>");
+        <% } %>
+    </script>
+</body>
+</html>
