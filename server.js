@@ -5,14 +5,18 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-// 🟢 MongoDB Connection (Render-এর Environment Variable বা সরাসরি String)
-const MONGO_URI = process.env.MONGO_URI || "আপনার_MONGODB_CONNECTION_STRING_এখানে_বসাবেন";
+// 🟢 MongoDB Connection (Render Environment Variable থেকে নেবে)
+const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully!'))
-    .catch(err => console.error('MongoDB Connection Error:', err));
+if (!MONGO_URI) {
+    console.error('❌ CRITICAL ERROR: MONGO_URI Environment Variable is missing in Render!');
+} else {
+    mongoose.connect(MONGO_URI)
+        .then(() => console.log('🟢 MongoDB Connected Successfully!'))
+        .catch(err => console.error('❌ MongoDB Connection Error:', err));
+}
 
 // 🟢 MongoDB Schemas & Models
 const movieSchema = new mongoose.Schema({
@@ -60,7 +64,7 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// 🟢 Multer Storage Setup for Poster Uploads
+// 🟢 Multer Storage Setup
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, 'public/uploads'));
@@ -111,6 +115,7 @@ app.get('/', async (req, res) => {
             totalPages
         });
     } catch (err) {
+        console.error(err);
         res.status(500).send('Server Error');
     }
 });
@@ -292,5 +297,5 @@ app.post('/admin/delete-category', isAdmin, async (req, res) => {
 
 // Server Start
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
