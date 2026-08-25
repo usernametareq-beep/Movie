@@ -1,0 +1,202 @@
+{
+  "adminPassword": "admin",
+  "categories": [
+    "Hindi Movie",
+    "Bangla Movie",
+    "Thriller"
+  ],
+  "movies": [
+    {
+      "id": "1787615395445",
+      "title": "Bachelor Point (2026)",
+      "category": "Hindi Movie",
+      "poster": "https://pub-69b6234af505413bbeac2bbc8039195c.r2.dev/poster_wm7n1787231362.jpg",
+      "videoLinks": [
+        {
+          "name": "ep 105 ",
+          "url": "https://cdn.dramalinkbd.tv/p/zZy1mhwddRlz2gma.eXF91FnX3z8cWFYZXINduYKzvOIT6OlqO35z2lH5p3tTNwQidNJkHVydkjERT1fQyXOlU-9jitvAkdtWAwq5ofWh34FibmyxzXCjpEwDhQTyTwmfd-ddVoUDgzldn7mAqVSJVz2rGnoQuSxMwFN3k3TKW2AOGH2708XbPF59GMhfGaqDAHC8mDJYbCg.4GVrJyFF-Pvk08wzD3gOUA"
+        },
+        {
+          "name": "ep 106",
+          "url": "https://cdn.dramalinkbd.tv/p/PSOhpcsbcCslkGSo._tFR6j_nnsAH5kne11BEtANdXXn3-mkNYJv2Dj0Z9qpiHsRylQBVqRLdEsM075CzfcDuOetpdlFsptS4i4LMXrjF8znL_L73WCsHcT-yr0UbSxKLjARmmsKuXXWf02KRWik-921vxvxGg75Hst7-DHl5wEcImmv9BMxfrFpExXHNHhXYi_qlcVp9vMg.GE7O5pLi9YjauTVzYTm1Pw"
+        },
+        {
+          "name": "ep 107",
+          "url": "https://cdn.dramalinkbd.tv/p/VXupEt9W0zAZ2wRP.u-QybjzUdy2xaFYBhF5cIRc6V5Q4rQLptaBUifSimA2brpmTw4H-H23jW3-yHAAHctKWXFcW8UczrngcHBLYiV-jsC00Y_z3kkZLZpAgn7_qL6_M4j-bvJJNWfoMkYl8Q-XOAszxjlxlWbbllBiurCk_o9Ha7VGxb7NRIXZ4J7kJqQwryp-V5BF6SU0.HSoaQw7QHdX0LvSR-VCY0Q"
+        },
+        {
+          "name": "ep 108",
+          "url": "https://cdn.dramalinkbd.tv/p/VKuW-wSeW5CvaySP.y9q_7Fw-PQVxVM4aWL39gOYca0cRlUMcbC2rC0m-Rk0E2Wk_TfBbteSlil7HajIqpPGv0iThQ7MhW0V3M_qY9YBY6iQtPtIHJPLqhU5oeiNQAsHSkYdhIk0X5Tkne-isX3rD9wlzAGsd8SEh9SfD1mIXhk3qhEJwmjGSod9DiRLWGGwoMUXM3Vq2mug.wR6X4I9279YWkJO0bZzj6g"
+        },
+        {
+          "name": "ep 109",
+          "url": "https://cdn.dramalinkbd.tv/p/8dMPgunXPoSbGYVO.TCTRyXwKsBlqF9RWMVTE3HnrbXKjsj0XHPzUb0HAi6j8VzEN4ImVOi9B4wHQoSSVmKA7wuGYhmPK9BEvI0LOVOW5g-zwkJ-k_rGtHBpsdBadzEvCw8kMdUOERhl8cfVIl1A2_XS0YRRqU8Fi33i9mj9FpiAihfoCYNS3xBR_2xY8BuJ90IHx7lVl9IQ.ZT9x6OH4-Z9vxQmXZHqRPg"
+        },
+        {
+          "name": "ep 110",
+          "url": "https://cdn.dramalinkbd.tv/p/sFpT5-g6kTSdQRoo.Upcj7V1sLq3apngATVYTmNq1INfhrIQllTIn4qjIXbXUeAyehy3ff8BNrJXnCJ8z3s6CbKcymRdaSJjcUm7F-Mu2dJUx0MvWdnkn88ntNaZmbXmrnl6cMghiVJeUNbR1kqOjLWWFNeE2d7NBT_OSeAp49orG65eRxasTp3YdwdckATawa2dBeLu0DBA.y3yTe3c6bkTl2M1tA0p-hA"
+        }
+      ],
+      "isPinned": true,
+      "views": 10
+    },
+    {
+      "id": "1787615102241",
+      "title": "v2",
+      "category": "Bangla Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/embed/ZKIGLzLoSaE"
+        }
+      ],
+      "isPinned": false,
+      "views": 5
+    },
+    {
+      "id": "1787615032625",
+      "title": "10",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=t2kFGacVLrc"
+        }
+      ],
+      "isPinned": false,
+      "views": 6
+    },
+    {
+      "id": "1787615020179",
+      "title": "9",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=U_gluv4sSRA"
+        }
+      ],
+      "isPinned": false,
+      "views": 2
+    },
+    {
+      "id": "1787615007858",
+      "title": "8",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=4-7f9LqN1Fk"
+        }
+      ],
+      "isPinned": false,
+      "views": 1
+    },
+    {
+      "id": "1787614978525",
+      "title": "7",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUIG2HpCy7-UrDWPtxOOdh7amULp9nd9RKb4GGsfT_xA&s",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=bJfYsweUtgA"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614959079",
+      "title": "6",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUIG2HpCy7-UrDWPtxOOdh7amULp9nd9RKb4GGsfT_xA&s",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=mVf4N6V_SdI"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614928324",
+      "title": "5",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=MofvbW5eYXs"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614872075",
+      "title": "4",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUIG2HpCy7-UrDWPtxOOdh7amULp9nd9RKb4GGsfT_xA&s",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=fj_wzWyuXBM"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614859082",
+      "title": "3",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=0r0iJNcKNZQ"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614844892",
+      "title": "2",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVcbyWX3nhOne2iukh2Y9n5Mnd9u5KGShjFea9tAwgXg&s=10",
+      "videoLinks": [
+        {
+          "name": "Server 1",
+          "url": "https://www.youtube.com/watch?v=q72ToGqBGEY"
+        }
+      ],
+      "isPinned": false,
+      "views": 0
+    },
+    {
+      "id": "1787614825706",
+      "title": "1",
+      "category": "Hindi Movie",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUIG2HpCy7-UrDWPtxOOdh7amULp9nd9RKb4GGsfT_xA&s",
+      "videoLinks": [
+        {
+          "name": "Youtube ",
+          "url": "https://www.youtube.com/watch?v=lcaBWuWbtr8"
+        },
+        {
+          "name": "drice",
+          "url": "https://www.youtube.com/watch?v=lcaBWuWbtr8"
+        }
+      ],
+      "isPinned": false,
+      "views": 2
+    }
+  ]
+}
