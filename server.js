@@ -96,7 +96,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// Single Movie Watch Page Route (সরাসরি প্লে পেজ)
+// Single Movie Watch Page Route
 app.get('/movie/:id', (req, res) => {
     const db = getData();
     const movie = db.movies.find(m => m.id === req.params.id);
@@ -105,7 +105,6 @@ app.get('/movie/:id', (req, res) => {
         return res.status(404).send('Movie Not Found');
     }
 
-    // View Count বাড়ানো
     movie.views = (movie.views || 0) + 1;
     saveData(db);
 
@@ -170,6 +169,20 @@ app.get('/admin', isAdmin, (req, res) => {
         msg: req.query.msg || null,
         err: req.query.err || null
     });
+});
+
+// ADMIN PASSWORD CHANGE ROUTE
+app.post('/admin/change-password', isAdmin, (req, res) => {
+    const db = getData();
+    const { oldPassword, newPassword } = req.body;
+
+    if (oldPassword === db.adminPassword) {
+        db.adminPassword = newPassword;
+        saveData(db);
+        res.redirect('/admin?msg=Password+changed+successfully!');
+    } else {
+        res.redirect('/admin?err=Old+password+does+not+match!');
+    }
 });
 
 app.post('/admin/save-movie', isAdmin, upload.single('posterFile'), (req, res) => {
@@ -246,6 +259,7 @@ app.post('/admin/delete-category', isAdmin, (req, res) => {
     res.redirect('/admin');
 });
 
+// Start Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
