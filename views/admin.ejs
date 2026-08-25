@@ -124,21 +124,19 @@
 <body>
 
     <div class="admin-container">
-        <!-- HEADER -->
         <div class="header">
             <h2>⚙️ Admin Control Panel</h2>
             <a href="/admin/logout" class="logout-btn">Logout</a>
         </div>
 
         <% if (typeof msg !== 'undefined' && msg) { %>
-            <div class="msg-box">Action completed successfully!</div>
+            <div class="msg-box"><%= msg %></div>
         <% } %>
         <% if (typeof err !== 'undefined' && err) { %>
-            <div class="err-box">Error occurred! Please check inputs.</div>
+            <div class="err-box"><%= err %></div>
         <% } %>
 
         <div class="grid-section">
-            <!-- MAIN MOVIE FORM -->
             <div class="card">
                 <h3><%= typeof movieToEdit !== 'undefined' && movieToEdit ? '✏️ Edit Movie' : '➕ Add New Movie' %></h3>
                 <form action="/admin/save-movie" method="POST" enctype="multipart/form-data">
@@ -170,7 +168,6 @@
                         <input type="text" name="posterUrl" value="<%= (typeof movieToEdit !== 'undefined' && movieToEdit) ? movieToEdit.poster : '' %>" placeholder="https://...">
                     </div>
 
-                    <!-- MULTIPLE SERVERS -->
                     <div class="form-group">
                         <label>Video Links / Servers</label>
                         <div id="videoLinksContainer">
@@ -205,9 +202,7 @@
                 </form>
             </div>
 
-            <!-- SIDEBAR SETTINGS -->
             <div>
-                <!-- CATEGORIES MANAGEMENT -->
                 <div class="card" style="margin-bottom: 20px;">
                     <h3>📂 Manage Categories</h3>
                     <form action="/admin/add-category" method="POST" style="margin-bottom: 15px;">
@@ -229,12 +224,11 @@
                     </form>
                 </div>
 
-                <!-- CHANGE PASSWORD -->
                 <div class="card">
                     <h3>🔒 Change Password</h3>
                     <form action="/admin/change-password" method="POST">
                         <div class="form-group">
-                            <input type="password" name="currentPassword" placeholder="Current Password" required>
+                            <input type="password" name="oldPassword" placeholder="Current Password" required>
                         </div>
                         <div class="form-group">
                             <input type="password" name="newPassword" placeholder="New Password" required>
@@ -245,7 +239,6 @@
             </div>
         </div>
 
-        <!-- MOVIE LIST TABLE -->
         <div class="card">
             <h3>🎬 All Movies List</h3>
             <div class="table-responsive">
