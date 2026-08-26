@@ -26,7 +26,7 @@
         video, iframe {
             width: 100%;
             display: block;
-            height: 480px;
+            height: 450px;
             border: none;
         }
         .player-controls {
@@ -119,51 +119,43 @@
         
         <h2><%= movie.title %></h2>
 
+        <!-- Helper Functions for YouTube Links -->
         <% 
             function getYouTubeEmbedUrl(url) {
-                if (!url) return null;
+                if (!url) return '';
                 let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                 let match = url.match(regExp);
                 return (match && match[2].length === 11) ? 'https://www.youtube.com/embed/' + match[2] : null;
             }
-
-            function isDirectMediaFile(url) {
-                if (!url) return false;
-                return url.match(/\.(mp4|webm|ogg|m4v)(\?.*)?$/i) || url.startsWith('/uploads/');
-            }
             
             let initialUrl = (movie.videoLinks && movie.videoLinks.length > 0) ? movie.videoLinks[0].url : '';
-            let ytEmbed = getYouTubeEmbedUrl(initialUrl);
-            let isDirectVideo = isDirectMediaFile(initialUrl);
+            let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
         %>
 
-        <!-- Main Video Container -->
+        <!-- Video Player Container -->
         <div class="video-player-box" id="playerContainer">
-            <% if (ytEmbed) { %>
-                <iframe id="embedPlayer" src="<%= ytEmbed %>" allowfullscreen allow="autoplay"></iframe>
-            <% } else if (isDirectVideo) { %>
+            <% if (initialYouTubeEmbed) { %>
+                <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
+            <% } else { %>
                 <video id="mainVideo" controls poster="<%= movie.poster %>">
-                    <source src="<%= initialUrl %>">
+                    <source src="<%= initialUrl %>" type="video/mp4">
                     Your browser does not support the video element.
                 </video>
-            <% } else { %>
-                <!-- Standard Embed Iframe for Streamtape, Vidhide, etc. -->
-                <iframe id="embedPlayer" src="<%= initialUrl %>" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             <% } %>
 
-            <!-- Custom 5 Sec Skip Controls (Only for Direct MP4/Local Video) -->
-            <div class="player-controls" id="controlsBox" style="<%= isDirectVideo ? '' : 'display: none;' %>">
+            <!-- Custom 5 Sec Skip Controls for HTML5 Local Video -->
+            <div class="player-controls" id="controlsBox" style="<%= initialYouTubeEmbed ? 'display: none;' : '' %>">
                 <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
                 <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
             </div>
         </div>
 
-        <!-- Movie Information -->
+        <!-- Movie Details -->
         <div class="movie-details">
             <p><strong>Category:</strong> <%= movie.category %></p>
             <p><strong>Views:</strong> <%= movie.views %></p>
 
-            <!-- Server Selection -->
+            <!-- Server Links -->
             <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
                 <div class="server-buttons">
                     <strong>Select Server:</strong><br><br>
@@ -193,40 +185,31 @@
     </div>
 
     <script>
+        // Extract YouTube Video ID
         function parseYouTubeUrl(url) {
             let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             let match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        function isDirectVideoUrl(url) {
-            return url.match(/\.(mp4|webm|ogg|m4v)(\?.*)?$/i) || url.startsWith('/uploads/');
-        }
-
+        // Dynamically switch between YouTube iframe and HTML5 video
         function switchVideoServer(url) {
             const container = document.getElementById('playerContainer');
+            const controlsBox = document.getElementById('controlsBox');
             const ytId = parseYouTubeUrl(url);
 
             if (ytId) {
-                container.innerHTML = `
-                    <iframe id="embedPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>
-                    <div class="player-controls" id="controlsBox" style="display: none;"></div>
-                `;
-            } else if (isDirectVideoUrl(url)) {
+                container.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
+                if (controlsBox) controlsBox.style.display = 'none';
+            } else {
                 container.innerHTML = `
                     <video id="mainVideo" controls autoplay>
-                        <source src="${url}">
+                        <source src="${url}" type="video/mp4">
                     </video>
                     <div class="player-controls" id="controlsBox">
                         <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
                         <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
                     </div>
-                `;
-            } else {
-                // Generic Embedded Iframe Handler for sites like Streamtape, Vidhide, etc.
-                container.innerHTML = `
-                    <iframe id="embedPlayer" src="${url}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-                    <div class="player-controls" id="controlsBox" style="display: none;"></div>
                 `;
             }
         }
@@ -246,7 +229,7 @@
             }
         }
 
-        // Arrow Key Keyboard Shortcuts (Only works when playing direct MP4 / local HTML5 video)
+        // Handle Arrow key 5-sec skip for standard HTML5 video
         window.addEventListener('keydown', function (e) {
             const video = document.getElementById('mainVideo');
             if (!video) return;
