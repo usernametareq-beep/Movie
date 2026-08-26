@@ -2,11 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MongoDB Connection String (Render Environment Variable focus)
+// Uploads Folder Auto Create Check
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// MongoDB Connection String
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://usernametareq_db_user:BOaae2HMvEh7n9Bz@cluster0.gmubyza.mongodb.net/moviehouse?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI)
@@ -27,10 +34,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ==========================================
 // Database Schemas & Models
-// ==========================================
-
 const settingsSchema = new mongoose.Schema({
     adminPassword: { type: String, default: "admin" },
     categories: { type: [String], default: ["Drama", "Action", "Hindi Movie", "Bangla Movie", "Thriller"] },
@@ -54,7 +58,6 @@ const movieSchema = new mongoose.Schema({
 const Settings = mongoose.model('Settings', settingsSchema);
 const Movie = mongoose.model('Movie', movieSchema);
 
-// Helper function to get or create settings
 async function getSettings() {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -63,8 +66,7 @@ async function getSettings() {
     return settings;
 }
 
-// Simple Session/Auth Simulation
-let isLoggedAdmin = true; // Production-এ আসল session use করতে পারেন
+let isLoggedAdmin = true;
 
 function isAdmin(req, res, next) {
     if (isLoggedAdmin) {
@@ -74,22 +76,33 @@ function isAdmin(req, res, next) {
     }
 }
 
-// ==========================================
 // Frontend Routes
-// ==========================================
 
-// Home Page
+// Home Page Route
 app.get('/', async (req, res) => {
     try {
         const settings = await getSettings();
+        const selectedCategory = req.query.category || '';
+        const selectedSubcategory = req.query.sub || '';
+        
+        let query = { isPinned: false };
+        if (selectedCategory) {
+            query.category = selectedCategory;
+        }
+        if (selectedSubcategory) {
+            query.subcategory = selectedSubcategory;
+        }
+
         const pinnedMovies = await Movie.find({ isPinned: true }).sort({ createdAt: -1 });
-        const latestMovies = await Movie.find({ isPinned: false }).sort({ createdAt: -1 });
+        const latestMovies = await Movie.find(query).sort({ createdAt: -1 });
         
         res.render('index', {
             categories: settings.categories,
             subcategories: settings.subcategories || [],
             pinnedMovies,
-            latestMovies
+            latestMovies,
+            selectedCategory,
+            selectedSubcategory
         });
     } catch (err) {
         res.status(500).send("Error loading home page.");
@@ -113,32 +126,6 @@ app.get('/movie/:id', async (req, res) => {
     }
 });
 
-// Category/Subcategory Filter Route
-app.get('/category/:categoryName', async (req, res) => {
-    try {
-        const categoryName = req.params.categoryName;
-        const subcategoryName = req.query.sub;
-        
-        let query = { category: categoryName };
-        if (subcategoryName) {
-            query.subcategory = subcategoryName;
-        }
-
-        const movies = await Movie.find(query).sort({ createdAt: -1 });
-        const settings = await getSettings();
-
-        res.render('category', { 
-            categoryName, 
-            subcategoryName, 
-            movies, 
-            categories: settings.categories,
-            subcategories: settings.subcategories || []
-        });
-    } catch (err) {
-        res.status(500).send("Error loading category page.");
-    }
-});
-
 // Search Route
 app.get('/search', async (req, res) => {
     try {
@@ -153,11 +140,8 @@ app.get('/search', async (req, res) => {
     }
 });
 
-// ==========================================
 // Admin Panel Routes
-// ==========================================
 
-// Admin Dashboard GET
 app.get('/admin', isAdmin, async (req, res) => {
     try {
         const settings = await getSettings();
@@ -177,7 +161,6 @@ app.get('/admin', isAdmin, async (req, res) => {
     }
 });
 
-// Save or Update Movie POST
 app.post('/admin/save-movie', isAdmin, upload.single('posterFile'), async (req, res) => {
     try {
         const { id, title, category, subcategory, posterUrl, linkUrl, isPinned } = req.body;
@@ -216,7 +199,6 @@ app.post('/admin/save-movie', isAdmin, upload.single('posterFile'), async (req, 
     }
 });
 
-// Add Subcategory POST
 app.post('/admin/add-subcategory', isAdmin, async (req, res) => {
     try {
         const { subcategoryName, parentCategory } = req.body;
@@ -237,7 +219,6 @@ app.post('/admin/add-subcategory', isAdmin, async (req, res) => {
     }
 });
 
-// Delete Subcategory POST
 app.post('/admin/delete-subcategory', isAdmin, async (req, res) => {
     try {
         const { subcategoryId } = req.body;
@@ -250,7 +231,6 @@ app.post('/admin/delete-subcategory', isAdmin, async (req, res) => {
     }
 });
 
-// Toggle Pin Status POST
 app.post('/admin/toggle-pin/:id', isAdmin, async (req, res) => {
     try {
         const movie = await Movie.findById(req.params.id);
@@ -264,7 +244,6 @@ app.post('/admin/toggle-pin/:id', isAdmin, async (req, res) => {
     }
 });
 
-// Delete Movie POST
 app.post('/admin/delete-movie/:id', isAdmin, async (req, res) => {
     try {
         await Movie.findByIdAndDelete(req.params.id);
@@ -274,7 +253,6 @@ app.post('/admin/delete-movie/:id', isAdmin, async (req, res) => {
     }
 });
 
-// Start Server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
