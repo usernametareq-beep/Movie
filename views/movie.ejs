@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= movie.title %> - Movie House</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .video-player-box {
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        video, iframe {
+            width: 100%;
+            display: block;
+            height: 480px;
+            border: none;
+        }
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background-color: #1f1f1f;
+            padding: 12px;
+        }
+        .control-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .control-btn:hover {
+            background-color: #b80710;
+        }
+        .movie-details {
+            margin-top: 20px;
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .server-buttons {
+            margin-top: 15px;
+        }
+        .server-btn {
+            display: inline-block;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .server-btn:hover {
+            background-color: #555;
+        }
+        .related-section {
+            margin-top: 30px;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .related-card {
+            background-color: #1f1f1f;
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: white;
+        }
+        .related-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .related-card p {
+            padding: 8px;
+            margin: 0;
+            font-size: 13px;
+            text-align: center;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #aaa;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <h2><%= movie.title %></h2>
+
+        <% 
+            function getYouTubeEmbedUrl(url) {
+                if (!url) return null;
+                let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                let match = url.match(regExp);
+                return (match && match[2].length === 11) ? 'https://www.youtube.com/embed/' + match[2] : null;
+            }
+
+            function isDirectMediaFile(url) {
+                if (!url) return false;
+                return url.match(/\.(mp4|webm|ogg|m4v)(\?.*)?$/i) || url.startsWith('/uploads/');
+            }
+            
+            let initialUrl = (movie.videoLinks && movie.videoLinks.length > 0) ? movie.videoLinks[0].url : '';
+            let ytEmbed = getYouTubeEmbedUrl(initialUrl);
+            let isDirectVideo = isDirectMediaFile(initialUrl);
+        %>
+
+        <!-- Main Video Container -->
+        <div class="video-player-box" id="playerContainer">
+            <% if (ytEmbed) { %>
+                <iframe id="embedPlayer" src="<%= ytEmbed %>" allowfullscreen allow="autoplay"></iframe>
+            <% } else if (isDirectVideo) { %>
+                <video id="mainVideo" controls poster="<%= movie.poster %>">
+                    <source src="<%= initialUrl %>">
+                    Your browser does not support the video element.
+                </video>
+            <% } else { %>
+                <!-- Standard Embed Iframe for Streamtape, Vidhide, etc. -->
+                <iframe id="embedPlayer" src="<%= initialUrl %>" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            <% } %>
+
+            <!-- Custom 5 Sec Skip Controls (Only for Direct MP4/Local Video) -->
+            <div class="player-controls" id="controlsBox" style="<%= isDirectVideo ? '' : 'display: none;' %>">
+                <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
+                <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
+            </div>
+        </div>
+
+        <!-- Movie Information -->
+        <div class="movie-details">
+            <p><strong>Category:</strong> <%= movie.category %></p>
+            <p><strong>Views:</strong> <%= movie.views %></p>
+
+            <!-- Server Selection -->
+            <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
+                <div class="server-buttons">
+                    <strong>Select Server:</strong><br><br>
+                    <% movie.videoLinks.forEach((link, index) => { %>
+                        <button class="server-btn" onclick="switchVideoServer('<%= link.url %>')">
+                            <%= link.name || 'Server ' + (index + 1) %>
+                        </button>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Related Movies -->
+        <% if (typeof relatedMovies !== 'undefined' && relatedMovies.length > 0) { %>
+            <div class="related-section">
+                <h3>Related Movies</h3>
+                <div class="related-grid">
+                    <% relatedMovies.forEach(rel => { %>
+                        <a href="/movie/<%= rel._id %>" class="related-card">
+                            <img src="<%= rel.poster %>" alt="<%= rel.title %>">
+                            <p><%= rel.title %></p>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function parseYouTubeUrl(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function isDirectVideoUrl(url) {
+            return url.match(/\.(mp4|webm|ogg|m4v)(\?.*)?$/i) || url.startsWith('/uploads/');
+        }
+
+        function switchVideoServer(url) {
+            const container = document.getElementById('playerContainer');
+            const ytId = parseYouTubeUrl(url);
+
+            if (ytId) {
+                container.innerHTML = `
+                    <iframe id="embedPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>
+                    <div class="player-controls" id="controlsBox" style="display: none;"></div>
+                `;
+            } else if (isDirectVideoUrl(url)) {
+                container.innerHTML = `
+                    <video id="mainVideo" controls autoplay>
+                        <source src="${url}">
+                    </video>
+                    <div class="player-controls" id="controlsBox">
+                        <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
+                        <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
+                    </div>
+                `;
+            } else {
+                // Generic Embedded Iframe Handler for sites like Streamtape, Vidhide, etc.
+                container.innerHTML = `
+                    <iframe id="embedPlayer" src="${url}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                    <div class="player-controls" id="controlsBox" style="display: none;"></div>
+                `;
+            }
+        }
+
+        function rewind(seconds = 5) {
+            const video = document.getElementById('mainVideo');
+            if (video) {
+                video.currentTime = Math.max(0, video.currentTime - seconds);
+            }
+        }
+
+        function forward(seconds = 5) {
+            const video = document.getElementById('mainVideo');
+            if (video) {
+                const maxTime = isNaN(video.duration) ? video.currentTime + seconds : video.duration;
+                video.currentTime = Math.min(maxTime, video.currentTime + seconds);
+            }
+        }
+
+        // Arrow Key Keyboard Shortcuts (Only works when playing direct MP4 / local HTML5 video)
+        window.addEventListener('keydown', function (e) {
+            const video = document.getElementById('mainVideo');
+            if (!video) return;
+
+            const activeTag = document.activeElement.tagName;
+            if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+
+            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
+                e.preventDefault();
+                e.stopPropagation();
+                rewind(5);
+            } else if (e.key === 'ArrowRight' || e.keyCode === 39) {
+                e.preventDefault();
+                e.stopPropagation();
+                forward(5);
+            }
+        }, true);
+    </script>
+</body>
+</html>
