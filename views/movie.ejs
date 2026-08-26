@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= movie.title %> - Bangla Movie House</title>
+    <title><%= movie.title %> - Movie House</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #141414;
+            background-color: red;
             color: #fff;
             margin: 0;
             padding: 20px;
@@ -66,7 +66,8 @@
             margin-right: 8px;
             margin-bottom: 8px;
             border-radius: 4px;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
             font-size: 14px;
         }
         .server-btn:hover {
@@ -125,7 +126,7 @@
                 Your browser does not support the video element.
             </video>
 
-            <!-- Custom 5 Sec Skip Controls -->
+            <!-- Custom Buttons -->
             <div class="player-controls">
                 <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
                 <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
@@ -137,7 +138,7 @@
             <p><strong>Category:</strong> <%= movie.category %></p>
             <p><strong>Views:</strong> <%= movie.views %></p>
 
-            <!-- Multiple Server Links -->
+            <!-- Server Links -->
             <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
                 <div class="server-buttons">
                     <strong>Select Server:</strong><br><br>
@@ -166,45 +167,46 @@
         <% } %>
     </div>
 
-    <!-- JavaScript logic for 5-sec Forward/Backward & Shortcuts -->
+    <!-- JavaScript For 5-sec Keyboard Skip Logic -->
     <script>
         const video = document.getElementById('mainVideo');
 
-        // Rewind function
-        function rewind(seconds) {
+        function rewind(seconds = 5) {
             if (video) {
                 video.currentTime = Math.max(0, video.currentTime - seconds);
             }
         }
 
-        // Forward function
-        function forward(seconds) {
+        function forward(seconds = 5) {
             if (video) {
-                video.currentTime = Math.min(video.duration || 0, video.currentTime + seconds);
+                const maxTime = isNaN(video.duration) ? video.currentTime + seconds : video.duration;
+                video.currentTime = Math.min(maxTime, video.currentTime + seconds);
             }
         }
 
-        // Change video server dynamically
         function changeServer(url) {
             if (video) {
                 video.src = url;
+                video.load();
                 video.play();
             }
         }
 
-        // Keyboard Shortcuts (Left / Right Arrow)
-        document.addEventListener('keydown', function(event) {
-            // Check if active element is not an input field
-            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                if (event.key === 'ArrowLeft') {
-                    event.preventDefault();
-                    rewind(5);
-                } else if (event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    forward(5);
-                }
+        // Override default browser skip (forces 5-sec jump)
+        window.addEventListener('keydown', function (e) {
+            const activeTag = document.activeElement.tagName;
+            if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+
+            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
+                e.preventDefault();
+                e.stopPropagation();
+                rewind(5);
+            } else if (e.key === 'ArrowRight' || e.keyCode === 39) {
+                e.preventDefault();
+                e.stopPropagation();
+                forward(5);
             }
-        });
+        }, true);
     </script>
 </body>
 </html>
