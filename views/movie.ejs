@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: red;
+            background-color: #141414;
             color: #fff;
             margin: 0;
             padding: 20px;
@@ -21,11 +21,13 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
-        video {
+        video, iframe {
             width: 100%;
             display: block;
-            max-height: 500px;
+            height: 450px;
+            border: none;
         }
         .player-controls {
             display: flex;
@@ -117,23 +119,38 @@
         
         <h2><%= movie.title %></h2>
 
-        <!-- Video Player Section -->
-        <div class="video-player-box">
-            <video id="mainVideo" controls poster="<%= movie.poster %>">
-                <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
-                    <source src="<%= movie.videoLinks[0].url %>" type="video/mp4">
-                <% } %>
-                Your browser does not support the video element.
-            </video>
+        <!-- Helper Functions for YouTube Links -->
+        <% 
+            function getYouTubeEmbedUrl(url) {
+                if (!url) return '';
+                let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                let match = url.match(regExp);
+                return (match && match[2].length === 11) ? 'https://www.youtube.com/embed/' + match[2] : null;
+            }
+            
+            let initialUrl = (movie.videoLinks && movie.videoLinks.length > 0) ? movie.videoLinks[0].url : '';
+            let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
+        %>
 
-            <!-- Custom Buttons -->
-            <div class="player-controls">
+        <!-- Video Player Container -->
+        <div class="video-player-box" id="playerContainer">
+            <% if (initialYouTubeEmbed) { %>
+                <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
+            <% } else { %>
+                <video id="mainVideo" controls poster="<%= movie.poster %>">
+                    <source src="<%= initialUrl %>" type="video/mp4">
+                    Your browser does not support the video element.
+                </video>
+            <% } %>
+
+            <!-- Custom 5 Sec Skip Controls for HTML5 Local Video -->
+            <div class="player-controls" id="controlsBox" style="<%= initialYouTubeEmbed ? 'display: none;' : '' %>">
                 <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
                 <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
             </div>
         </div>
 
-        <!-- Movie Information -->
+        <!-- Movie Details -->
         <div class="movie-details">
             <p><strong>Category:</strong> <%= movie.category %></p>
             <p><strong>Views:</strong> <%= movie.views %></p>
@@ -143,7 +160,7 @@
                 <div class="server-buttons">
                     <strong>Select Server:</strong><br><br>
                     <% movie.videoLinks.forEach((link, index) => { %>
-                        <button class="server-btn" onclick="changeServer('<%= link.url %>')">
+                        <button class="server-btn" onclick="switchVideoServer('<%= link.url %>')">
                             <%= link.name || 'Server ' + (index + 1) %>
                         </button>
                     <% }) %>
@@ -167,33 +184,56 @@
         <% } %>
     </div>
 
-    <!-- JavaScript For 5-sec Keyboard Skip Logic -->
     <script>
-        const video = document.getElementById('mainVideo');
+        // Extract YouTube Video ID
+        function parseYouTubeUrl(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Dynamically switch between YouTube iframe and HTML5 video
+        function switchVideoServer(url) {
+            const container = document.getElementById('playerContainer');
+            const controlsBox = document.getElementById('controlsBox');
+            const ytId = parseYouTubeUrl(url);
+
+            if (ytId) {
+                container.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
+                if (controlsBox) controlsBox.style.display = 'none';
+            } else {
+                container.innerHTML = `
+                    <video id="mainVideo" controls autoplay>
+                        <source src="${url}" type="video/mp4">
+                    </video>
+                    <div class="player-controls" id="controlsBox">
+                        <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
+                        <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
+                    </div>
+                `;
+            }
+        }
 
         function rewind(seconds = 5) {
+            const video = document.getElementById('mainVideo');
             if (video) {
                 video.currentTime = Math.max(0, video.currentTime - seconds);
             }
         }
 
         function forward(seconds = 5) {
+            const video = document.getElementById('mainVideo');
             if (video) {
                 const maxTime = isNaN(video.duration) ? video.currentTime + seconds : video.duration;
                 video.currentTime = Math.min(maxTime, video.currentTime + seconds);
             }
         }
 
-        function changeServer(url) {
-            if (video) {
-                video.src = url;
-                video.load();
-                video.play();
-            }
-        }
-
-        // Override default browser skip (forces 5-sec jump)
+        // Handle Arrow key 5-sec skip for standard HTML5 video
         window.addEventListener('keydown', function (e) {
+            const video = document.getElementById('mainVideo');
+            if (!video) return;
+
             const activeTag = document.activeElement.tagName;
             if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
 
