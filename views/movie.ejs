@@ -1,85 +1,210 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= movie.title %></title>
+    <title><%= movie.title %> - Bangla Movie House</title>
     <style>
-        body { background: #141414; color: #fff; padding: 20px; text-align: center; font-family: sans-serif; }
-        .back-btn { display: inline-block; color: #f1c40f; text-decoration: none; margin-bottom: 15px; font-weight: bold; }
-        .player-box { width: 80%; max-width: 900px; height: 450px; margin: 0 auto; background: #000; border-radius: 8px; overflow: hidden; }
-        iframe, video { width: 100%; height: 100%; border: none; }
-        .server-container { margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .server-btn { padding: 10px 15px; background: #f1c40f; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .server-btn:hover { background: #d4ac0d; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .video-player-box {
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        video {
+            width: 100%;
+            display: block;
+            max-height: 500px;
+        }
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background-color: #1f1f1f;
+            padding: 12px;
+        }
+        .control-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .control-btn:hover {
+            background-color: #b80710;
+        }
+        .movie-details {
+            margin-top: 20px;
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .server-buttons {
+            margin-top: 15px;
+        }
+        .server-btn {
+            display: inline-block;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .server-btn:hover {
+            background-color: #555;
+        }
+        .related-section {
+            margin-top: 30px;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .related-card {
+            background-color: #1f1f1f;
+            border-radius: 6px;
+            overflow: hidden;
+            text-decoration: none;
+            color: white;
+        }
+        .related-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .related-card p {
+            padding: 8px;
+            margin: 0;
+            font-size: 13px;
+            text-align: center;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #aaa;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <h2><%= movie.title %></h2>
 
-    <a href="/" class="back-btn">← Home Page</a>
-    <h2><%= movie.title %></h2>
+        <!-- Video Player Section -->
+        <div class="video-player-box">
+            <video id="mainVideo" controls poster="<%= movie.poster %>">
+                <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
+                    <source src="<%= movie.videoLinks[0].url %>" type="video/mp4">
+                <% } %>
+                Your browser does not support the video element.
+            </video>
 
-    <!-- Dynamic Player Container -->
-    <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
-        <div class="player-box" id="playerBox"></div>
-
-        <!-- Dynamic Server Buttons -->
-        <div class="server-container">
-            <% movie.videoLinks.forEach((link, index) => { %>
-                <button class="server-btn" onclick="playMedia('<%= link.url %>')">
-                    <%= link.name || 'Server ' + (index + 1) %>
-                </button>
-            <% }) %>
+            <!-- Custom 5 Sec Skip Controls -->
+            <div class="player-controls">
+                <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
+                <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
+            </div>
         </div>
-    <% } else { %>
-        <p style="margin-top: 30px;">কোন ভিডিও লিংক পাওয়া যায়নি!</p>
-    <% } %>
 
-    <script>
-        // YouTube, Google Drive & Direct File Auto Formatting
-        function getCleanUrl(url) {
-            if (!url) return '';
-            
-            // Iframe Tag Paste handling
-            if (url.includes('<iframe')) {
-                const match = url.match(/src=["']([^"']+)["']/);
-                if (match) url = match[1];
-            }
+        <!-- Movie Information -->
+        <div class="movie-details">
+            <p><strong>Category:</strong> <%= movie.category %></p>
+            <p><strong>Views:</strong> <%= movie.views %></p>
 
-            // YouTube Links
-            if (url.includes('youtube.com/watch?v=')) {
-                return url.replace('watch?v=', 'embed/');
-            }
-            if (url.includes('youtu.be/')) {
-                return url.replace('youtu.be/', 'youtube.com/embed/');
-            }
+            <!-- Multiple Server Links -->
+            <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
+                <div class="server-buttons">
+                    <strong>Select Server:</strong><br><br>
+                    <% movie.videoLinks.forEach((link, index) => { %>
+                        <button class="server-btn" onclick="changeServer('<%= link.url %>')">
+                            <%= link.name || 'Server ' + (index + 1) %>
+                        </button>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
 
-            // Google Drive Links
-            if (url.includes('drive.google.com') && url.includes('/view')) {
-                return url.replace('/view', '/preview');
-            }
-
-            return url;
-        }
-
-        function playMedia(rawUrl) {
-            const box = document.getElementById('playerBox');
-            if (!box) return;
-
-            const cleanUrl = getCleanUrl(rawUrl);
-
-            // Directly play MP4 / MKV files, otherwise use iframe
-            if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.mkv')) {
-                box.innerHTML = `<video controls autoplay><source src="${cleanUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
-            } else {
-                box.innerHTML = `<iframe src="${cleanUrl}" allowfullscreen allow="autoplay"></iframe>`;
-            }
-        }
-
-        // Auto play the first server link on load
-        <% if (movie.videoLinks && movie.videoLinks.length > 0) { %>
-            playMedia("<%= movie.videoLinks[0].url %>");
+        <!-- Related Movies -->
+        <% if (typeof relatedMovies !== 'undefined' && relatedMovies.length > 0) { %>
+            <div class="related-section">
+                <h3>Related Movies</h3>
+                <div class="related-grid">
+                    <% relatedMovies.forEach(rel => { %>
+                        <a href="/movie/<%= rel._id %>" class="related-card">
+                            <img src="<%= rel.poster %>" alt="<%= rel.title %>">
+                            <p><%= rel.title %></p>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
         <% } %>
+    </div>
+
+    <!-- JavaScript logic for 5-sec Forward/Backward & Shortcuts -->
+    <script>
+        const video = document.getElementById('mainVideo');
+
+        // Rewind function
+        function rewind(seconds) {
+            if (video) {
+                video.currentTime = Math.max(0, video.currentTime - seconds);
+            }
+        }
+
+        // Forward function
+        function forward(seconds) {
+            if (video) {
+                video.currentTime = Math.min(video.duration || 0, video.currentTime + seconds);
+            }
+        }
+
+        // Change video server dynamically
+        function changeServer(url) {
+            if (video) {
+                video.src = url;
+                video.play();
+            }
+        }
+
+        // Keyboard Shortcuts (Left / Right Arrow)
+        document.addEventListener('keydown', function(event) {
+            // Check if active element is not an input field
+            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    rewind(5);
+                } else if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    forward(5);
+                }
+            }
+        });
     </script>
 </body>
 </html>
