@@ -1,307 +1,321 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Panel - Movie House</title>
     <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --primary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: var(--bg-dark); 
-            color: var(--text-main); 
-            padding: 30px 15px; 
-        }
-
-        .admin-container { max-width: 1100px; margin: 0 auto; }
-        
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--card-bg); 
-            padding: 15px 25px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            margin-bottom: 25px; 
-        }
-
-        .header h2 { font-size: 20px; color: var(--primary); }
-        .logout-btn { 
-            background: var(--danger); 
-            color: #fff; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 13px;
-        }
-
-        .grid-section { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr; 
-            gap: 20px; 
-            margin-bottom: 30px; 
-        }
-        @media (max-width: 768px) { .grid-section { grid-template-columns: 1fr; } }
-
-        .card { 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-        }
-
-        .card h3 { 
-            font-size: 16px; 
-            border-bottom: 1px solid var(--border-color); 
-            padding-bottom: 10px; 
-            margin-bottom: 15px; 
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
             color: #fff;
+            margin: 0;
+            padding: 20px;
         }
-
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
-        input[type="text"], input[type="password"], select, textarea { 
-            width: 100%; 
-            padding: 10px; 
-            background: #0f172a; 
-            color: #fff; 
-            border: 1px solid var(--border-color); 
-            border-radius: 6px; 
-            font-size: 14px; 
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
         }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
-
-        .server-input-group { display: flex; gap: 8px; margin-bottom: 8px; }
-        .server-input-group input { margin-bottom: 0; }
-
-        .btn { 
-            padding: 10px 18px; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 13px; 
-            transition: 0.2s; 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-add { background: #3b82f6; color: #fff; margin-top: 5px; }
-        .btn-remove { background: var(--danger); color: #fff; padding: 0 12px; }
-        .btn-pin { background: var(--warning); color: #000; }
-        .btn-unpin { background: #475569; color: #fff; }
-        .btn-delete { background: var(--danger); color: #fff; }
-
-        .checkbox-container { display: flex; align-items: center; gap: 8px; margin: 15px 0; }
-        .checkbox-container input { width: auto; cursor: pointer; }
-
-        /* Table Design */
-        .table-responsive { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        th { background: #0f172a; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
-        tr:hover { background: rgba(255,255,255,0.02); }
-
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .badge-pinned { background: var(--warning); color: #000; }
-        .badge-normal { background: #334155; color: #fff; }
-
-        .msg-box { padding: 10px; background: #064e3b; color: #6ee7b7; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
-        .err-box { padding: 10px; background: #7f1d1d; color: #fca5a5; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
+        .card {
+            background: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #2b2b2b;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #b80710;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .alert {
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background-color: #2b2b2b;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
-
-    <div class="admin-container">
+    <div class="container">
         <div class="header">
-            <h2>⚙️ Admin Control Panel</h2>
-            <a href="/admin/logout" class="logout-btn">Logout</a>
+            <h2>Admin Panel</h2>
+            <a href="/" style="color: #aaa; text-decoration: none;">← Visit Site</a>
         </div>
 
         <% if (typeof msg !== 'undefined' && msg) { %>
-            <div class="msg-box"><%= msg %></div>
-        <% } %>
-        <% if (typeof err !== 'undefined' && err) { %>
-            <div class="err-box"><%= err %></div>
+            <div class="alert"><%= msg %></div>
         <% } %>
 
-        <div class="grid-section">
-            <div class="card">
-                <h3><%= typeof movieToEdit !== 'undefined' && movieToEdit ? '✏️ Edit Movie' : '➕ Add New Movie' %></h3>
-                <form action="/admin/save-movie" method="POST" enctype="multipart/form-data">
-                    <% if (typeof movieToEdit !== 'undefined' && movieToEdit) { %>
-                        <input type="hidden" name="id" value="<%= movieToEdit.id %>">
-                    <% } %>
+        <!-- Add / Edit Movie Form -->
+        <div class="card">
+            <h3><%= movieToEdit ? 'Edit Movie' : 'Add New Movie' %></h3>
+            <form action="/admin/save-movie" method="POST" enctype="multipart/form-data" class="action-form">
+                <% if (movieToEdit) { %>
+                    <input type="hidden" name="id" value="<%= movieToEdit._id %>">
+                <% } %>
 
-                    <div class="form-group">
-                        <label>Movie Title</label>
-                        <input type="text" name="title" value="<%= (typeof movieToEdit !== 'undefined' && movieToEdit) ? movieToEdit.title : '' %>" required placeholder="Enter movie title">
-                    </div>
+                <div class="form-group">
+                    <label>Movie Title:</label>
+                    <input type="text" name="title" value="<%= movieToEdit ? movieToEdit.title : '' %>" required>
+                </div>
 
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select name="category">
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Category:</label>
+                        <select name="category" id="mainCatSelect" onchange="updateSubcatOptions()" required>
+                            <option value="">Select Category</option>
                             <% categories.forEach(cat => { %>
-                                <option value="<%= cat %>" <%= (typeof movieToEdit !== 'undefined' && movieToEdit && movieToEdit.category === cat) ? 'selected' : '' %>><%= cat %></option>
+                                <option value="<%= cat %>" <%= (movieToEdit && movieToEdit.category === cat) ? 'selected' : '' %>><%= cat %></option>
                             <% }) %>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Upload Poster Image</label>
-                        <input type="file" name="posterFile">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Subcategory:</label>
+                        <select name="subcategory" id="subCatSelect">
+                            <option value="">Select Subcategory (Optional)</option>
+                        </select>
                     </div>
-
-                    <div class="form-group">
-                        <label>Poster Image URL (Optional)</label>
-                        <input type="text" name="posterUrl" value="<%= (typeof movieToEdit !== 'undefined' && movieToEdit) ? movieToEdit.poster : '' %>" placeholder="https://...">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Video Links / Servers</label>
-                        <div id="videoLinksContainer">
-                            <% if (typeof movieToEdit !== 'undefined' && movieToEdit && movieToEdit.videoLinks && movieToEdit.videoLinks.length > 0) { %>
-                                <% movieToEdit.videoLinks.forEach((link, index) => { %>
-                                    <div class="server-input-group">
-                                        <input type="text" name="linkName[]" value="<%= link.name %>" placeholder="Server Name">
-                                        <input type="text" name="linkUrl[]" value="<%= link.url %>" placeholder="Video / Embed URL" required>
-                                        <% if (index > 0) { %>
-                                            <button type="button" class="btn btn-remove" onclick="removeServer(this)">✕</button>
-                                        <% } %>
-                                    </div>
-                                <% }) %>
-                            <% } else { %>
-                                <div class="server-input-group">
-                                    <input type="text" name="linkName[]" value="Server 1" placeholder="Server Name">
-                                    <input type="text" name="linkUrl[]" placeholder="Video / Embed URL" required>
-                                </div>
-                            <% } %>
-                        </div>
-                        <button type="button" class="btn btn-add" onclick="addServerField()">+ Add More Server</button>
-                    </div>
-
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="isPinned" name="isPinned" <%= (typeof movieToEdit !== 'undefined' && movieToEdit && movieToEdit.isPinned) ? 'checked' : '' %>>
-                        <label for="isPinned" style="margin-bottom:0; cursor:pointer;">📌 Pin this movie to top</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
-                        <%= (typeof movieToEdit !== 'undefined' && movieToEdit) ? 'Update Movie' : 'Save Movie' %>
-                    </button>
-                </form>
-            </div>
-
-            <div>
-                <div class="card" style="margin-bottom: 20px;">
-                    <h3>📂 Manage Categories</h3>
-                    <form action="/admin/add-category" method="POST" style="margin-bottom: 15px;">
-                        <div class="form-group">
-                            <input type="text" name="categoryName" placeholder="New category name" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width:100%;">Add Category</button>
-                    </form>
-
-                    <form action="/admin/delete-category" method="POST">
-                        <div class="form-group">
-                            <select name="categoryName">
-                                <% categories.forEach(cat => { %>
-                                    <option value="<%= cat %>"><%= cat %></option>
-                                <% }) %>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-remove" style="width:100%;">Delete Category</button>
-                    </form>
                 </div>
 
-                <div class="card">
-                    <h3>🔒 Change Password</h3>
-                    <form action="/admin/change-password" method="POST">
-                        <div class="form-group">
-                            <input type="password" name="oldPassword" placeholder="Current Password" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="password" name="newPassword" placeholder="New Password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width:100%;">Update Password</button>
-                    </form>
+                <div class="form-group">
+                    <label>Poster Image URL:</label>
+                    <input type="text" name="posterUrl" value="<%= movieToEdit ? movieToEdit.poster : '' %>" placeholder="https://image-link.com/poster.jpg">
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label>Video / Stream Link (MP4, YouTube, Streamtape, etc.):</label>
+                    <input type="text" name="linkUrl" value="<%= (movieToEdit && movieToEdit.videoLinks && movieToEdit.videoLinks.length > 0) ? movieToEdit.videoLinks[0].url : '' %>" required placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="isPinned" <%= (movieToEdit && movieToEdit.isPinned) ? 'checked' : '' %>> Pin to Home Page
+                    </label>
+                </div>
+
+                <button type="submit" class="btn"><%= movieToEdit ? 'Update Movie' : 'Upload Movie' %></button>
+                <% if (movieToEdit) { %>
+                    <a href="/admin" style="color: #aaa; margin-left: 10px;">Cancel Edit</a>
+                <% } %>
+            </form>
         </div>
 
+        <!-- Manage Subcategories -->
         <div class="card">
-            <h3>🎬 All Movies List</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Poster</th>
-                            <th>Title</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <h3>Manage Subcategories</h3>
+            <form action="/admin/add-subcategory" method="POST" class="action-form" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <select name="parentCategory" required style="flex: 1;">
+                    <option value="">Select Parent Category</option>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat %>"><%= cat %></option>
+                    <% }) %>
+                </select>
+                <input type="text" name="subcategoryName" placeholder="Subcategory Name" required style="flex: 1;">
+                <button type="submit" class="btn btn-success">Add Subcategory</button>
+            </form>
+
+            <h4>Existing Subcategories:</h4>
+            <ul>
+                <% if (typeof subcategories !== 'undefined' && subcategories.length > 0) { %>
+                    <% subcategories.forEach(sub => { %>
+                        <li style="margin-bottom: 8px;">
+                            <strong><%= sub.parentCategory %></strong> ➔ <%= sub.name %>
+                            <form action="/admin/delete-subcategory" method="POST" class="action-form" style="display: inline; margin-left: 10px;">
+                                <input type="hidden" name="subcategoryId" value="<%= sub._id %>">
+                                <button type="submit" class="action-btn" style="color: #ff4d4d;">Delete</button>
+                            </form>
+                        </li>
+                    <% }) %>
+                <% } else { %>
+                    <p style="color: #aaa;">No subcategories added yet.</p>
+                <% } %>
+            </ul>
+        </div>
+
+        <!-- All Movies List with Live Search -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                <h3 style="margin: 0;">All Movies List</h3>
+                <input 
+                    type="text" 
+                    id="adminMovieSearch" 
+                    onkeyup="filterAdminMovies()" 
+                    placeholder="🔍 Search movies by title or category..." 
+                    style="width: 280px;"
+                >
+            </div>
+
+            <table id="movieTable">
+                <thead>
+                    <tr>
+                        <th>Poster</th>
+                        <th>Title</th>
+                        <th>Category / Subcategory</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (movies && movies.length > 0) { %>
                         <% movies.forEach(movie => { %>
-                            <tr>
-                                <td><img src="<%= movie.poster %>" width="40" height="55" style="object-fit:cover; border-radius:4px;"></td>
-                                <td><strong><%= movie.title %></strong></td>
-                                <td><%= movie.category %></td>
-                                <td>
-                                    <% if (movie.isPinned) { %>
-                                        <span class="badge badge-pinned">PINNED</span>
-                                    <% } else { %>
-                                        <span class="badge badge-normal">Normal</span>
-                                    <% } %>
+                            <tr class="movie-row">
+                                <td style="text-align: center;">
+                                    <img src="<%= movie.poster %>" width="45" height="60" style="object-fit: cover; border-radius: 4px;">
                                 </td>
+                                <td class="movie-title">
+                                    <strong><%= movie.title %></strong>
+                                    <% if (movie.isPinned) { %> <span style="color: gold;">📌 Pinned</span> <% } %>
+                                </td>
+                                <td class="movie-category">
+                                    <%= movie.category %> 
+                                    <% if (movie.subcategory) { %> <small style="color: #aaa;">(<%= movie.subcategory %>)</small> <% } %>
+                                </td>
+                                <td><%= movie.views || 0 %></td>
                                 <td>
-                                    <form action="/admin/toggle-pin/<%= movie.id %>" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn <%= movie.isPinned ? 'btn-unpin' : 'btn-pin' %>" style="padding:4px 8px; font-size:11px;">
+                                    <a href="/admin?edit=<%= movie._id %>" style="color: #4da6ff; margin-right: 8px; text-decoration: none;">Edit</a>
+                                    
+                                    <form action="/admin/toggle-pin/<%= movie._id %>" method="POST" class="action-form" style="display: inline;">
+                                        <button type="submit" class="action-btn" style="color: gold;">
                                             <%= movie.isPinned ? 'Unpin' : 'Pin' %>
                                         </button>
                                     </form>
-                                    <a href="/admin?edit=<%= movie.id %>" class="btn btn-add" style="padding:4px 8px; font-size:11px; text-decoration:none;">Edit</a>
-                                    <form action="/admin/delete-movie/<%= movie.id %>" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-delete" style="padding:4px 8px; font-size:11px;">Delete</button>
+                                    | 
+                                    <form action="/admin/delete-movie/<%= movie._id %>" method="POST" class="action-form" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                        <button type="submit" class="action-btn" style="color: #ff4d4d;">Delete</button>
                                     </form>
                                 </td>
                             </tr>
                         <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #aaa;">No movies found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        function addServerField() {
-            const container = document.getElementById('videoLinksContainer');
-            const count = container.querySelectorAll('.server-input-group').length + 1;
+        // 🟢 ১. সাব-ক্যাটাগরি ডাইনামিক ড্রপডাউন ফিল্টার
+        const allSubcategories = <%- JSON.stringify(subcategories || []) %>;
+        const selectedSub = "<%= movieToEdit ? movieToEdit.subcategory : '' %>";
+
+        function updateSubcatOptions() {
+            const mainCat = document.getElementById('mainCatSelect').value;
+            const subSelect = document.getElementById('subCatSelect');
             
-            const div = document.createElement('div');
-            div.className = 'server-input-group';
-            div.innerHTML = `
-                <input type="text" name="linkName[]" value="Server ${count}" placeholder="Server Name">
-                <input type="text" name="linkUrl[]" placeholder="Video / Embed URL" required>
-                <button type="button" class="btn btn-remove" onclick="removeServer(this)">✕</button>
-            `;
-            container.appendChild(div);
+            subSelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+
+            const filteredSubs = allSubcategories.filter(sub => sub.parentCategory === mainCat);
+            
+            filteredSubs.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.name;
+                option.textContent = sub.name;
+                if (sub.name === selectedSub) {
+                    option.selected = true;
+                }
+                subSelect.appendChild(option);
+            });
         }
 
-        function removeServer(button) {
-            button.parentElement.remove();
+        // 🟢 ২. টেবিলের ভেতর লাইভ সার্চ লজিক
+        function filterAdminMovies() {
+            const filter = document.getElementById('adminMovieSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#movieTable tbody .movie-row');
+
+            rows.forEach(row => {
+                const titleText = row.querySelector('.movie-title').textContent.toLowerCase();
+                const categoryText = row.querySelector('.movie-category').textContent.toLowerCase();
+
+                if (titleText.includes(filter) || categoryText.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
+
+        // 🟢 ৩. স্ক্রোল পজিশন ধরে রাখার স্মার্ট মেমোরি
+        document.addEventListener("DOMContentLoaded", function () {
+            updateSubcatOptions();
+
+            const scrollPosition = localStorage.getItem("adminScrollPosition");
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition, 10));
+                localStorage.removeItem("adminScrollPosition");
+            }
+
+            const actionForms = document.querySelectorAll(".action-form");
+            actionForms.forEach(form => {
+                form.addEventListener("submit", function () {
+                    localStorage.setItem("adminScrollPosition", window.scrollY);
+                });
+            });
+        });
     </script>
 </body>
 </html>
