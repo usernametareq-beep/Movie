@@ -41,7 +41,6 @@
         .btn-unpin { background: #475569; color: #fff; }
         .btn-delete { background: var(--danger); color: #fff; }
         
-        /* FIX 1: Badge text split fix */
         .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap !important; display: inline-block; }
         .badge-pinned { background: var(--warning); color: #000; }
         .badge-normal { background: #334155; color: #fff; }
@@ -49,18 +48,31 @@
 
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .search-box { width: 250px !important; padding: 8px 12px !important; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         th { background: #0f172a; color: var(--text-muted); font-size: 12px; }
         
-        /* FIX 2: Actions column 1-line layout fix */
-        td.action-cell {
-            display: flex !important;
-            align-items: center;
-            gap: 6px;
+        /* TITLE TEXT HIDE & ELLIPSIS FIX */
+        td.movie-title {
+            max-width: 250px;
             white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        /* ACTIONS CELL FIXED */
+        td.action-cell {
+            white-space: nowrap !important;
+            width: 170px;
         }
         
+        .action-cell-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .msg-box { padding: 10px; background: #064e3b; color: #6ee7b7; border-radius: 6px; margin-bottom: 15px; }
         .err-box { padding: 10px; background: #7f1d1d; color: #fca5a5; border-radius: 6px; margin-bottom: 15px; }
     </style>
@@ -209,25 +221,27 @@
                 <table id="moviesTable">
                     <thead>
                         <tr>
-                            <th>Poster</th>
+                            <th style="width: 60px;">Poster</th>
                             <th>Title</th>
-                            <th>Type</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th style="width: 100px;">Type</th>
+                            <th style="width: 120px;">Category</th>
+                            <th style="width: 90px;">Status</th>
+                            <th style="width: 170px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% movies.forEach(movie => { %>
                             <tr>
                                 <td><img src="<%= movie.poster %>" width="40" height="55" style="object-fit:cover; border-radius:4px;"></td>
-                                <td class="movie-title"><strong><%= movie.title %></strong></td>
+                                <td class="movie-title" title="<%= movie.title %>">
+                                    <strong><%= movie.title %></strong>
+                                </td>
                                 <td>
                                     <span class="badge <%= movie.contentType === 'series' ? 'badge-series' : 'badge-normal' %>">
                                         <%= movie.contentType === 'series' ? 'Web Series' : 'Movie' %>
                                     </span>
                                 </td>
-                                <td><%= movie.category %></td>
+                                <td style="white-space: nowrap;"><%= movie.category %></td>
                                 <td>
                                     <% if (movie.isPinned) { %>
                                         <span class="badge badge-pinned">PINNED</span>
@@ -236,15 +250,17 @@
                                     <% } %>
                                 </td>
                                 <td class="action-cell">
-                                    <form action="/admin/toggle-pin/<%= movie.id %>" method="POST" style="display:inline;" class="scroll-form">
-                                        <button type="submit" class="btn <%= movie.isPinned ? 'btn-unpin' : 'btn-pin' %>" style="padding:4px 8px; font-size:11px;">
-                                            <%= movie.isPinned ? 'Unpin' : 'Pin' %>
-                                        </button>
-                                    </form>
-                                    <a href="/admin?edit=<%= movie.id %>" class="btn btn-add" style="padding:4px 8px; font-size:11px; text-decoration:none;">Edit</a>
-                                    <form action="/admin/delete-movie/<%= movie.id %>" method="POST" style="display:inline;" class="scroll-form" onsubmit="return confirm('Delete this?')">
-                                        <button type="submit" class="btn btn-delete" style="padding:4px 8px; font-size:11px;">Delete</button>
-                                    </form>
+                                    <div class="action-cell-wrapper">
+                                        <form action="/admin/toggle-pin/<%= movie.id %>" method="POST" style="display:inline;" class="scroll-form">
+                                            <button type="submit" class="btn <%= movie.isPinned ? 'btn-unpin' : 'btn-pin' %>" style="padding:4px 8px; font-size:11px;">
+                                                <%= movie.isPinned ? 'Unpin' : 'Pin' %>
+                                            </button>
+                                        </form>
+                                        <a href="/admin?edit=<%= movie.id %>" class="btn btn-add" style="padding:4px 8px; font-size:11px; text-decoration:none;">Edit</a>
+                                        <form action="/admin/delete-movie/<%= movie.id %>" method="POST" style="display:inline;" class="scroll-form" onsubmit="return confirm('Delete this?')">
+                                            <button type="submit" class="btn btn-delete" style="padding:4px 8px; font-size:11px;">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <% }) %>
@@ -313,7 +329,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            toggleContentType(); // পেজ লোড হওয়ার সাথে সাথে সেকশন হাইড/শো হ্যান্ডেল করবে
+            toggleContentType();
             
             const scrollPos = localStorage.getItem("adminScrollPos");
             if (scrollPos) { 
