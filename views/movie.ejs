@@ -138,8 +138,6 @@
             font-size: 13px;
             text-align: center;
         }
-
-        /* TeraBox Custom UI */
         .terabox-container {
             display: flex;
             flex-direction: column;
@@ -148,26 +146,25 @@
             height: 450px;
             padding: 20px;
             text-align: center;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
         }
         .terabox-btn {
             background-color: #e50914;
             color: #ffffff;
-            padding: 16px 32px;
-            border-radius: 30px;
+            padding: 14px 28px;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 20px rgba(229, 9, 20, 0.5);
-            transition: all 0.3s ease;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(229,9,20,0.4);
+            transition: transform 0.2s, background-color 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         .terabox-btn:hover {
-            background-color: #ff1e27;
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(229, 9, 20, 0.7);
+            background-color: #b80710;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -198,21 +195,7 @@
 
             function isTeraboxLink(url) {
                 if (!url || typeof url !== 'string') return false;
-                return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|api\/streaming/i.test(url);
-            }
-
-            function getCleanTeraboxUrl(url) {
-                if (!url || typeof url !== 'string') return url;
-                if (url.includes('api/streaming')) {
-                    try {
-                        let parsedUrl = new URL(url);
-                        let pathParam = parsedUrl.searchParams.get('path');
-                        if (pathParam) {
-                            return 'https://www.terabox.com/sharing/link?surl=' + pathParam;
-                        }
-                    } catch(e) {}
-                }
-                return url;
+                return /terabox|neobox|teraboxapp|1024tera|freeterabox/i.test(url);
             }
 
             function isGenericEmbed(url) {
@@ -233,7 +216,6 @@
 
             initialUrl = formatDriveUrl(initialUrl);
             let initialIsTerabox = isTeraboxLink(initialUrl);
-            let initialCleanTeraboxUrl = getCleanTeraboxUrl(initialUrl);
             let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
             let initialIsEmbed = isGenericEmbed(initialUrl);
             let defaultPoster = 'https://via.placeholder.com/300x400?text=No+Poster';
@@ -243,12 +225,11 @@
             <div id="mediaArea">
                 <% if (initialIsTerabox) { %>
                     <div class="terabox-container">
-                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Stream Ready</p>
-                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to watch <%= movie.title %> on TeraBox</p>
-                        
-                        <a href="<%= initialCleanTeraboxUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play / Open Video
+                        <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Server Selected</p>
+                        <a href="<%= initialUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Click Here to Watch / Download
                         </a>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Play directly on TeraBox server without error</span>
                     </div>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
@@ -335,25 +316,6 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        function isTeraboxLink(url) {
-            if (!url || typeof url !== 'string') return false;
-            return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|api\/streaming/i.test(url);
-        }
-
-        function getCleanTeraboxUrl(url) {
-            if (!url || typeof url !== 'string') return url;
-            if (url.includes('api/streaming')) {
-                try {
-                    let parsedUrl = new URL(url);
-                    let pathParam = parsedUrl.searchParams.get('path');
-                    if (pathParam) {
-                        return 'https://www.terabox.com/sharing/link?surl=' + pathParam;
-                    }
-                } catch(e) {}
-            }
-            return url;
-        }
-
         function switchVideoServer(url) {
             if (!url) return;
             url = processDriveUrl(url);
@@ -361,20 +323,19 @@
             const mediaArea = document.getElementById('mediaArea');
             const controlsBox = document.getElementById('controlsBox');
             
-            const isTeraBox = isTeraboxLink(url);
+            // TeraBox লিঙ্ক চেক
+            const isTeraBox = /terabox|neobox|teraboxapp|1024tera|freeterabox/i.test(url);
             const ytId = parseYouTubeUrl(url);
             const isEmbedLink = url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
 
             if (isTeraBox) {
-                const targetUrl = getCleanTeraboxUrl(url);
                 mediaArea.innerHTML = `
                     <div class="terabox-container">
-                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Stream Ready</p>
-                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to watch <%= movie.title %> on TeraBox</p>
-                        
-                        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play / Open Video
+                        <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Server Selected</p>
+                        <a href="${url}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Click Here to Watch / Download
                         </a>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Play directly on TeraBox server without error</span>
                     </div>
                 `;
                 if (controlsBox) controlsBox.style.display = 'none';
@@ -395,11 +356,12 @@
             }
         }
 
-        // Seasons & Episodes Dynamic Loader
+        // Process Seasons & Episodes dynamically from admin inputs
         document.addEventListener('DOMContentLoaded', () => {
             const episodes = movieData.episodes || [];
             if (episodes.length === 0) return;
 
+            // Group episodes by season number
             const seasonsMap = {};
             episodes.forEach((ep, index) => {
                 let sNum = ep.season || ep.seasonNumber || ep.seasonNo || ep.s || 1;
@@ -432,6 +394,7 @@
                 });
             }
 
+            // Show Seasons if there is more than 1 season
             if (seasonKeys.length > 1) {
                 seasonsContainer.style.display = 'block';
                 seasonButtonsBox.innerHTML = '';
@@ -450,6 +413,7 @@
                 });
             }
 
+            // Initially render Season 1 episodes
             renderEpisodes(seasonKeys[0]);
         });
 
