@@ -139,7 +139,7 @@
             text-align: center;
         }
 
-        /* TeraBox UI Design */
+        /* TeraBox Custom UI */
         .terabox-container {
             display: flex;
             flex-direction: column;
@@ -201,6 +201,20 @@
                 return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|api\/streaming/i.test(url);
             }
 
+            function getCleanTeraboxUrl(url) {
+                if (!url || typeof url !== 'string') return url;
+                if (url.includes('api/streaming')) {
+                    try {
+                        let parsedUrl = new URL(url);
+                        let pathParam = parsedUrl.searchParams.get('path');
+                        if (pathParam) {
+                            return 'https://www.terabox.com/sharing/link?surl=' + pathParam;
+                        }
+                    } catch(e) {}
+                }
+                return url;
+            }
+
             function isGenericEmbed(url) {
                 if (!url || typeof url !== 'string') return false;
                 return url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
@@ -219,26 +233,22 @@
 
             initialUrl = formatDriveUrl(initialUrl);
             let initialIsTerabox = isTeraboxLink(initialUrl);
+            let initialCleanTeraboxUrl = getCleanTeraboxUrl(initialUrl);
             let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
             let initialIsEmbed = isGenericEmbed(initialUrl);
             let defaultPoster = 'https://via.placeholder.com/300x400?text=No+Poster';
-
-            // TeraBox Embed Player URL Generator
-            let teraboxPlayUrl = 'https://terabox.tech/embed?url=' + encodeURIComponent(initialUrl);
         %>
 
         <div class="video-player-box">
             <div id="mediaArea">
                 <% if (initialIsTerabox) { %>
                     <div class="terabox-container">
-                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Server Ready</p>
-                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to start streaming <%= movie.title %></p>
+                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Stream Ready</p>
+                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to watch <%= movie.title %> on TeraBox</p>
                         
-                        <a href="<%= teraboxPlayUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play Movie Now
+                        <a href="<%= initialCleanTeraboxUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Play / Open Video
                         </a>
-                        
-                        <span style="font-size: 12px; color: #94a3b8; margin-top: 15px;">Opens player in a new tab to bypass iframe restrictions.</span>
                     </div>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
@@ -330,6 +340,20 @@
             return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|api\/streaming/i.test(url);
         }
 
+        function getCleanTeraboxUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            if (url.includes('api/streaming')) {
+                try {
+                    let parsedUrl = new URL(url);
+                    let pathParam = parsedUrl.searchParams.get('path');
+                    if (pathParam) {
+                        return 'https://www.terabox.com/sharing/link?surl=' + pathParam;
+                    }
+                } catch(e) {}
+            }
+            return url;
+        }
+
         function switchVideoServer(url) {
             if (!url) return;
             url = processDriveUrl(url);
@@ -342,17 +366,15 @@
             const isEmbedLink = url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
 
             if (isTeraBox) {
-                const teraboxPlayUrl = 'https://terabox.tech/embed?url=' + encodeURIComponent(url);
+                const targetUrl = getCleanTeraboxUrl(url);
                 mediaArea.innerHTML = `
                     <div class="terabox-container">
-                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Server Ready</p>
-                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to start streaming <%= movie.title %></p>
+                        <p style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #fff;">TeraBox Stream Ready</p>
+                        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 25px;">Click below to watch <%= movie.title %> on TeraBox</p>
                         
-                        <a href="${teraboxPlayUrl}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play Movie Now
+                        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Play / Open Video
                         </a>
-                        
-                        <span style="font-size: 12px; color: #94a3b8; margin-top: 15px;">Opens player in a new tab to bypass iframe restrictions.</span>
                     </div>
                 `;
                 if (controlsBox) controlsBox.style.display = 'none';
