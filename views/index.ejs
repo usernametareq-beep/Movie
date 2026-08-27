@@ -387,7 +387,8 @@
                             <% if (movie.isPinned) { %>
                                 <span class="pinned-badge">📌 PINNED</span>
                             <% } else { %>
-                                <% if (unpinnedCounter < 3) { %>
+                                <!-- FIX: শুধুমাত্র ১ নম্বর পেজে প্রথম ৩টি unpinned মুভিতে NEW ব্যাজ শো করবে -->
+                                <% if ((typeof currentPage === 'undefined' || Number(currentPage) === 1) && unpinnedCounter < 3) { %>
                                     <span class="new-badge">NEW</span>
                                     <% unpinnedCounter++; %>
                                 <% } %>
