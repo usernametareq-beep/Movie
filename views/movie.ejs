@@ -42,6 +42,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             position: relative;
+            min-height: 450px;
         }
         video, iframe {
             width: 100%;
@@ -137,6 +138,34 @@
             font-size: 13px;
             text-align: center;
         }
+        .terabox-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 450px;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+        }
+        .terabox-btn {
+            background-color: #e50914;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(229,9,20,0.4);
+            transition: transform 0.2s, background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terabox-btn:hover {
+            background-color: #b80710;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -164,11 +193,9 @@
                 return (match && match[2].length === 11) ? 'https://www.youtube.com/embed/' + match[2] : null;
             }
 
-            // TeraBox চেক করার ফাংশন
-            function getTeraboxEmbedUrl(url) {
-                if (!url || typeof url !== 'string') return null;
-                const isTeraBox = /terabox|neobox|teraboxapp|1024tera|freeterabox/i.test(url);
-                return isTeraBox ? 'https://flowvideoplayer.com/?url=' + encodeURIComponent(url) : null;
+            function isTeraboxLink(url) {
+                if (!url || typeof url !== 'string') return false;
+                return /terabox|neobox|teraboxapp|1024tera|freeterabox/i.test(url);
             }
 
             function isGenericEmbed(url) {
@@ -188,7 +215,7 @@
             }
 
             initialUrl = formatDriveUrl(initialUrl);
-            let initialTeraboxEmbed = getTeraboxEmbedUrl(initialUrl);
+            let initialIsTerabox = isTeraboxLink(initialUrl);
             let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
             let initialIsEmbed = isGenericEmbed(initialUrl);
             let defaultPoster = 'https://via.placeholder.com/300x400?text=No+Poster';
@@ -196,8 +223,14 @@
 
         <div class="video-player-box">
             <div id="mediaArea">
-                <% if (initialTeraboxEmbed) { %>
-                    <iframe id="teraboxPlayer" src="<%= initialTeraboxEmbed %>" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowusermedia scrolling="no"></iframe>
+                <% if (initialIsTerabox) { %>
+                    <div class="terabox-container">
+                        <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Server Selected</p>
+                        <a href="<%= initialUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Click Here to Watch / Download
+                        </a>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Play directly on TeraBox server without error</span>
+                    </div>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
                 <% } else if (initialIsEmbed) { %>
@@ -210,7 +243,7 @@
                 <% } %>
             </div>
 
-            <div class="player-controls" id="controlsBox" style="<%= (initialTeraboxEmbed || initialYouTubeEmbed || initialIsEmbed) ? 'display: none;' : '' %>">
+            <div class="player-controls" id="controlsBox" style="<%= (initialIsTerabox || initialYouTubeEmbed || initialIsEmbed) ? 'display: none;' : '' %>">
                 <button class="control-btn" tabindex="0" onclick="rewind(5)">⏪ 5 Sec</button>
                 <button class="control-btn" tabindex="0" onclick="forward(5)">5 Sec ⏩</button>
             </div>
@@ -296,8 +329,15 @@
             const isEmbedLink = url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
 
             if (isTeraBox) {
-                const teraboxEmbedUrl = "https://flowvideoplayer.com/?url=" + encodeURIComponent(url);
-                mediaArea.innerHTML = `<iframe id="teraboxPlayer" src="${teraboxEmbedUrl}" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowusermedia scrolling="no"></iframe>`;
+                mediaArea.innerHTML = `
+                    <div class="terabox-container">
+                        <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Server Selected</p>
+                        <a href="${url}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Click Here to Watch / Download
+                        </a>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Play directly on TeraBox server without error</span>
+                    </div>
+                `;
                 if (controlsBox) controlsBox.style.display = 'none';
             } else if (ytId) {
                 mediaArea.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
