@@ -139,7 +139,7 @@
             text-align: center;
         }
 
-        /* TeraBox UI Design */
+        /* TeraBox Custom UI Design */
         .terabox-container {
             display: flex;
             flex-direction: column;
@@ -228,10 +228,10 @@
                 <% if (initialIsTerabox) { %>
                     <div class="terabox-container">
                         <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Stream Ready</p>
-                        <a href="https://www.terabox.tech/embed?url=<%= encodeURIComponent(initialUrl) %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play Video Player (New Tab)
+                        <a href="<%= initialUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Watch / Play Video (New Tab)
                         </a>
-                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Opens clean video player in a new tab without full TeraBox page</span>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to open and play directly on TeraBox</span>
                     </div>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
@@ -330,14 +330,13 @@
             const isEmbedLink = url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
 
             if (isTeraBox) {
-                const teraboxCleanPlayerUrl = 'https://www.terabox.tech/embed?url=' + encodeURIComponent(url);
                 mediaArea.innerHTML = `
                     <div class="terabox-container">
                         <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Stream Ready</p>
-                        <a href="${teraboxCleanPlayerUrl}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Play Video Player (New Tab)
+                        <a href="${url}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Watch / Play Video (New Tab)
                         </a>
-                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Opens clean video player in a new tab without full TeraBox page</span>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to open and play directly on TeraBox</span>
                     </div>
                 `;
                 if (controlsBox) controlsBox.style.display = 'none';
