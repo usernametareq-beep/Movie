@@ -1,252 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= movie.title %> - Movie House</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #141414;
-            color: #fff;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .video-player-box {
-            background-color: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-        video, iframe {
-            width: 100%;
-            display: block;
-            height: 450px;
-            border: none;
-        }
-        .player-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            background-color: #1f1f1f;
-            padding: 12px;
-        }
-        .control-btn {
-            background-color: #e50914;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .control-btn:hover {
-            background-color: #b80710;
-        }
-        .movie-details {
-            margin-top: 20px;
-            background-color: #1f1f1f;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .server-buttons {
-            margin-top: 15px;
-        }
-        .server-btn {
-            display: inline-block;
-            background-color: #333;
-            color: #fff;
-            padding: 8px 12px;
-            margin-right: 8px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .server-btn:hover {
-            background-color: #555;
-        }
-        .related-section {
-            margin-top: 30px;
-        }
-        .related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .related-card {
-            background-color: #1f1f1f;
-            border-radius: 6px;
-            overflow: hidden;
-            text-decoration: none;
-            color: white;
-        }
-        .related-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .related-card p {
-            padding: 8px;
-            margin: 0;
-            font-size: 13px;
-            text-align: center;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            color: #aaa;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= movie.title %> - MovieHouse</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    <div class="container">
-        <a href="/" class="back-link">← Back to Home</a>
+<body class="bg-gray-900 text-white p-6">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    <a href="/" class="text-red-500 text-sm font-semibold hover:underline">&larr; Back to Home</a>
+
+    <div class="bg-gray-800 rounded-lg p-6 space-y-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <img src="<%= movie.poster || '/placeholder.jpg' %>" alt="<%= movie.title %>" class="w-48 h-72 rounded object-cover">
+        <div class="space-y-2">
+          <h1 class="text-3xl font-bold"><%= movie.title %></h1>
+          <p class="text-sm text-gray-400">Category: <span class="text-white"><%= movie.category %></span></p>
+          <p class="text-sm text-gray-400">Type: <span class="text-white capitalize"><%= movie.contentType %></span></p>
+          <p class="text-sm text-gray-400">Total Views: <span class="text-white"><%= movie.views %></span></p>
+        </div>
+      </div>
+
+      <!-- Player / Streaming Links -->
+      <div class="border-t border-gray-700 pt-6">
+        <h3 class="text-xl font-bold mb-4">Watch Now:</h3>
         
-        <h2><%= movie.title %></h2>
-
-        <!-- Helper Functions for YouTube Links -->
-        <% 
-            function getYouTubeEmbedUrl(url) {
-                if (!url) return '';
-                let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                let match = url.match(regExp);
-                return (match && match[2].length === 11) ? 'https://www.youtube.com/embed/' + match[2] : null;
-            }
-            
-            let initialUrl = (movie.videoLinks && movie.videoLinks.length > 0) ? movie.videoLinks[0].url : '';
-            let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
-        %>
-
-        <!-- Video Player Container -->
-        <div class="video-player-box" id="playerContainer">
-            <% if (initialYouTubeEmbed) { %>
-                <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
+        <% if (movie.contentType === 'movie') { %>
+          <div class="flex flex-wrap gap-3">
+            <% if (movie.videoLinks && movie.videoLinks.length) { %>
+              <% movie.videoLinks.forEach(link => { %>
+                <a href="<%= link.url %>" target="_blank" class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded text-sm font-bold transition">
+                  ▶ <%= link.name %>
+                </a>
+              <% }) %>
             <% } else { %>
-                <video id="mainVideo" controls poster="<%= movie.poster %>">
-                    <source src="<%= initialUrl %>" type="video/mp4">
-                    Your browser does not support the video element.
-                </video>
+              <p class="text-gray-500 text-sm">No stream links added yet.</p>
             <% } %>
-
-            <!-- Custom 5 Sec Skip Controls for HTML5 Local Video -->
-            <div class="player-controls" id="controlsBox" style="<%= initialYouTubeEmbed ? 'display: none;' : '' %>">
-                <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
-                <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
-            </div>
-        </div>
-
-        <!-- Movie Details -->
-        <div class="movie-details">
-            <p><strong>Category:</strong> <%= movie.category %></p>
-            <p><strong>Views:</strong> <%= movie.views %></p>
-
-            <!-- Server Links -->
-            <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
-                <div class="server-buttons">
-                    <strong>Select Server:</strong><br><br>
-                    <% movie.videoLinks.forEach((link, index) => { %>
-                        <button class="server-btn" onclick="switchVideoServer('<%= link.url %>')">
-                            <%= link.name || 'Server ' + (index + 1) %>
-                        </button>
-                    <% }) %>
-                </div>
+          </div>
+        <% } else { %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <% if (movie.episodes && movie.episodes.length) { %>
+              <% movie.episodes.forEach(ep => { %>
+                <a href="<%= ep.url %>" target="_blank" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex justify-between items-center transition">
+                  <span class="font-semibold text-sm">S<%= ep.season %> E<%= ep.episodeNumber %> - <%= ep.name %></span>
+                  <span class="text-red-400 text-xs">Watch &rarr;</span>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <p class="text-gray-500 text-sm">No episodes available.</p>
             <% } %>
-        </div>
-
-        <!-- Related Movies -->
-        <% if (typeof relatedMovies !== 'undefined' && relatedMovies.length > 0) { %>
-            <div class="related-section">
-                <h3>Related Movies</h3>
-                <div class="related-grid">
-                    <% relatedMovies.forEach(rel => { %>
-                        <a href="/movie/<%= rel._id %>" class="related-card">
-                            <img src="<%= rel.poster %>" alt="<%= rel.title %>">
-                            <p><%= rel.title %></p>
-                        </a>
-                    <% }) %>
-                </div>
-            </div>
+          </div>
         <% } %>
+      </div>
     </div>
 
-    <script>
-        // Extract YouTube Video ID
-        function parseYouTubeUrl(url) {
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            let match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+    <!-- Related Movies -->
+    <% if (relatedMovies && relatedMovies.length) { %>
+      <div>
+        <h3 class="text-xl font-bold mb-4">You Might Also Like</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <% relatedMovies.forEach(rel => { %>
+            <a href="/movie/<%= rel._id %>" class="bg-gray-800 rounded overflow-hidden block">
+              <img src="<%= rel.poster || '/placeholder.jpg' %>" class="w-full h-36 object-cover">
+              <p class="p-2 text-xs font-bold truncate"><%= rel.title %></p>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </div>
 
-        // Dynamically switch between YouTube iframe and HTML5 video
-        function switchVideoServer(url) {
-            const container = document.getElementById('playerContainer');
-            const controlsBox = document.getElementById('controlsBox');
-            const ytId = parseYouTubeUrl(url);
-
-            if (ytId) {
-                container.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
-                if (controlsBox) controlsBox.style.display = 'none';
-            } else {
-                container.innerHTML = `
-                    <video id="mainVideo" controls autoplay>
-                        <source src="${url}" type="video/mp4">
-                    </video>
-                    <div class="player-controls" id="controlsBox">
-                        <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
-                        <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
-                    </div>
-                `;
-            }
-        }
-
-        function rewind(seconds = 5) {
-            const video = document.getElementById('mainVideo');
-            if (video) {
-                video.currentTime = Math.max(0, video.currentTime - seconds);
-            }
-        }
-
-        function forward(seconds = 5) {
-            const video = document.getElementById('mainVideo');
-            if (video) {
-                const maxTime = isNaN(video.duration) ? video.currentTime + seconds : video.duration;
-                video.currentTime = Math.min(maxTime, video.currentTime + seconds);
-            }
-        }
-
-        // Handle Arrow key 5-sec skip for standard HTML5 video
-        window.addEventListener('keydown', function (e) {
-            const video = document.getElementById('mainVideo');
-            if (!video) return;
-
-            const activeTag = document.activeElement.tagName;
-            if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
-
-            if (e.key === 'ArrowLeft' || e.keyCode === 37) {
-                e.preventDefault();
-                e.stopPropagation();
-                rewind(5);
-            } else if (e.key === 'ArrowRight' || e.keyCode === 39) {
-                e.preventDefault();
-                e.stopPropagation();
-                forward(5);
-            }
-        }, true);
-    </script>
 </body>
 </html>
