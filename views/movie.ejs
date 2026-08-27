@@ -28,8 +28,9 @@
             font-size: 14px;
             transition: color 0.2s;
         }
-        .back-link:hover {
+        .back-link:hover, .back-link:focus {
             color: #fff;
+            outline: 2px solid #e50914;
         }
         .movie-title {
             margin-bottom: 15px;
@@ -67,8 +68,9 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .control-btn:hover {
+        .control-btn:hover, .control-btn:focus {
             background-color: #b80710;
+            outline: 2px solid #ffffff;
         }
         .movie-details {
             margin-top: 20px;
@@ -96,8 +98,9 @@
             font-size: 14px;
             transition: background 0.2s;
         }
-        .server-btn:hover {
+        .server-btn:hover, .server-btn:focus {
             background-color: #555;
+            outline: 2px solid #e50914;
         }
         .server-btn.active {
             background-color: #e50914;
@@ -119,8 +122,9 @@
             color: white;
             transition: transform 0.2s;
         }
-        .related-card:hover {
+        .related-card:hover, .related-card:focus {
             transform: scale(1.03);
+            outline: 2px solid #e50914;
         }
         .related-card img {
             width: 100%;
@@ -138,12 +142,21 @@
 <body>
 
     <div class="container">
-        <a href="/" class="back-link">← Back to Home</a>
+        <a href="/" class="back-link" tabindex="0">← Back to Home</a>
         
         <h2 class="movie-title"><%= movie.title %></h2>
 
-        <!-- EJS Helper Functions -->
         <% 
+            function formatDriveUrl(url) {
+                if (!url || typeof url !== 'string') return url;
+                if (url.includes('drive.google.com')) {
+                    return url.replace(/\/view(\?.*)?$/, '/preview')
+                              .replace(/\/edit(\?.*)?$/, '/preview')
+                              .replace(/\/usp=sharing$/, '');
+                }
+                return url;
+            }
+
             function getYouTubeEmbedUrl(url) {
                 if (!url || typeof url !== 'string') return null;
                 let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -167,12 +180,12 @@
                 initialUrl = movie.videoUrl;
             }
 
+            initialUrl = formatDriveUrl(initialUrl);
             let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
             let initialIsEmbed = isGenericEmbed(initialUrl);
             let defaultPoster = 'https://via.placeholder.com/300x400?text=No+Poster';
         %>
 
-        <!-- Main Video Container -->
         <div class="video-player-box">
             <div id="mediaArea">
                 <% if (initialYouTubeEmbed) { %>
@@ -187,39 +200,33 @@
                 <% } %>
             </div>
 
-            <!-- Custom Controls -->
             <div class="player-controls" id="controlsBox" style="<%= (initialYouTubeEmbed || initialIsEmbed) ? 'display: none;' : '' %>">
-                <button class="control-btn" onclick="rewind(5)">⏪ 5 Sec</button>
-                <button class="control-btn" onclick="forward(5)">5 Sec ⏩</button>
+                <button class="control-btn" tabindex="0" onclick="rewind(5)">⏪ 5 Sec</button>
+                <button class="control-btn" tabindex="0" onclick="forward(5)">5 Sec ⏩</button>
             </div>
         </div>
 
-        <!-- Movie & Series Details -->
         <div class="movie-details">
             <p><strong>Category:</strong> <%= movie.category %></p>
             <p><strong>Views:</strong> <%= movie.views %></p>
 
-            <!-- Dynamic Season & Episode Section -->
             <% if (movie.episodes && movie.episodes.length > 0) { %>
-                <!-- Seasons Row -->
                 <div class="server-buttons" id="seasonsContainer" style="display: none;">
                     <strong>Seasons:</strong><br><br>
                     <div id="seasonButtonsBox"></div>
                 </div>
 
-                <!-- Episodes Row -->
                 <div class="server-buttons" style="margin-top: 15px;">
                     <strong>Episodes:</strong><br><br>
                     <div id="episodesButtonsBox"></div>
                 </div>
             <% } %>
 
-            <!-- Movie Servers Selection -->
             <% if (movie.videoLinks && movie.videoLinks.length > 1) { %>
                 <div class="server-buttons">
                     <strong>Select Server:</strong><br><br>
                     <% movie.videoLinks.forEach((link, index) => { %>
-                        <button class="server-btn" onclick="switchVideoServer('<%= link.url %>')">
+                        <button class="server-btn" tabindex="0" onclick="switchVideoServer('<%= link.url %>')">
                             <%= link.name || 'Server ' + (index + 1) %>
                         </button>
                     <% }) %>
@@ -227,13 +234,12 @@
             <% } %>
         </div>
 
-        <!-- Related Content -->
         <% if (typeof relatedMovies !== 'undefined' && relatedMovies.length > 0) { %>
             <div class="related-section">
                 <h3>Related Content</h3>
                 <div class="related-grid">
                     <% relatedMovies.forEach(rel => { %>
-                        <a href="/movie/<%= rel._id %>" class="related-card">
+                        <a href="/movie/<%= rel._id %>" class="related-card" tabindex="0">
                             <img 
                                 src="<%= rel.poster %>" 
                                 alt="<%= rel.title %>" 
@@ -247,9 +253,18 @@
         <% } %>
     </div>
 
-    <!-- Dynamic Logic Script -->
     <script>
         const movieData = <%- JSON.stringify(movie) %>;
+
+        function processDriveUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            if (url.includes('drive.google.com')) {
+                return url.replace(/\/view(\?.*)?$/, '/preview')
+                          .replace(/\/edit(\?.*)?$/, '/preview')
+                          .replace(/\/usp=sharing$/, '');
+            }
+            return url;
+        }
 
         function parseYouTubeUrl(url) {
             if (!url || typeof url !== 'string') return null;
@@ -260,6 +275,8 @@
 
         function switchVideoServer(url) {
             if (!url) return;
+            url = processDriveUrl(url);
+
             const mediaArea = document.getElementById('mediaArea');
             const controlsBox = document.getElementById('controlsBox');
             
@@ -291,7 +308,6 @@
             // Group episodes by season number
             const seasonsMap = {};
             episodes.forEach((ep, index) => {
-                // Read season number from various possible field names
                 let sNum = ep.season || ep.seasonNumber || ep.seasonNo || ep.s || 1;
                 if (!seasonsMap[sNum]) {
                     seasonsMap[sNum] = [];
@@ -315,6 +331,7 @@
 
                     const btn = document.createElement('button');
                     btn.className = 'server-btn';
+                    btn.setAttribute('tabindex', '0');
                     btn.innerText = epTitle;
                     btn.onclick = () => switchVideoServer(epUrl);
                     episodesButtonsBox.appendChild(btn);
@@ -329,6 +346,7 @@
                 seasonKeys.forEach((sKey, idx) => {
                     const btn = document.createElement('button');
                     btn.className = 'server-btn season-btn' + (idx === 0 ? ' active' : '');
+                    btn.setAttribute('tabindex', '0');
                     btn.innerText = 'Season ' + sKey;
                     btn.onclick = () => {
                         document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
