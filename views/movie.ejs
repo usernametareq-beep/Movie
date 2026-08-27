@@ -197,7 +197,7 @@
         <div class="video-player-box">
             <div id="mediaArea">
                 <% if (initialTeraboxEmbed) { %>
-                    <iframe id="teraboxPlayer" src="<%= initialTeraboxEmbed %>" allowfullscreen allow="autoplay" scrolling="no"></iframe>
+                    <iframe id="teraboxPlayer" src="<%= initialTeraboxEmbed %>" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowusermedia scrolling="no"></iframe>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
                 <% } else if (initialIsEmbed) { %>
@@ -297,7 +297,7 @@
 
             if (isTeraBox) {
                 const teraboxEmbedUrl = "https://flowvideoplayer.com/?url=" + encodeURIComponent(url);
-                mediaArea.innerHTML = `<iframe id="teraboxPlayer" src="${teraboxEmbedUrl}" allowfullscreen allow="autoplay" scrolling="no"></iframe>`;
+                mediaArea.innerHTML = `<iframe id="teraboxPlayer" src="${teraboxEmbedUrl}" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowusermedia scrolling="no"></iframe>`;
                 if (controlsBox) controlsBox.style.display = 'none';
             } else if (ytId) {
                 mediaArea.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/${ytId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
