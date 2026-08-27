@@ -139,7 +139,7 @@
             text-align: center;
         }
 
-        /* TeraBox Custom UI Design */
+        /* TeraBox UI Design */
         .terabox-container {
             display: flex;
             flex-direction: column;
@@ -197,7 +197,19 @@
 
             function isTeraboxLink(url) {
                 if (!url || typeof url !== 'string') return false;
-                return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox/i.test(url);
+                return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|fapi\/streaming/i.test(url);
+            }
+
+            function cleanTeraboxUrl(url) {
+                if (!url || typeof url !== 'string') return url;
+                if (url.includes('fapi/streaming')) {
+                    try {
+                        let parsed = new URL(url);
+                        let path = parsed.searchParams.get('path');
+                        if (path) return 'https://www.terabox.com/sharing/link?surl=' + path;
+                    } catch(e) {}
+                }
+                return url;
             }
 
             function isGenericEmbed(url) {
@@ -218,6 +230,7 @@
 
             initialUrl = formatDriveUrl(initialUrl);
             let initialIsTerabox = isTeraboxLink(initialUrl);
+            let cleanedInitialUrl = cleanTeraboxUrl(initialUrl);
             let initialYouTubeEmbed = getYouTubeEmbedUrl(initialUrl);
             let initialIsEmbed = isGenericEmbed(initialUrl);
             let defaultPoster = 'https://via.placeholder.com/300x400?text=No+Poster';
@@ -228,10 +241,10 @@
                 <% if (initialIsTerabox) { %>
                     <div class="terabox-container">
                         <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Stream Ready</p>
-                        <a href="<%= initialUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Watch / Play Video (New Tab)
+                        <a href="<%= cleanedInitialUrl %>" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Open & Watch on TeraBox (New Tab)
                         </a>
-                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to open and play directly on TeraBox</span>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to view and stream directly on TeraBox</span>
                     </div>
                 <% } else if (initialYouTubeEmbed) { %>
                     <iframe id="ytPlayer" src="<%= initialYouTubeEmbed %>" allowfullscreen allow="autoplay"></iframe>
@@ -318,6 +331,23 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
+        function isTeraboxLink(url) {
+            if (!url || typeof url !== 'string') return false;
+            return /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox|fapi\/streaming/i.test(url);
+        }
+
+        function cleanTeraboxUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            if (url.includes('fapi/streaming')) {
+                try {
+                    let parsed = new URL(url);
+                    let path = parsed.searchParams.get('path');
+                    if (path) return 'https://www.terabox.com/sharing/link?surl=' + path;
+                } catch(e) {}
+            }
+            return url;
+        }
+
         function switchVideoServer(url) {
             if (!url) return;
             url = processDriveUrl(url);
@@ -325,18 +355,19 @@
             const mediaArea = document.getElementById('mediaArea');
             const controlsBox = document.getElementById('controlsBox');
             
-            const isTeraBox = /terabox|neobox|teraboxapp|1024tera|freeterabox|1024terabox|teraboxlink|momerybox/i.test(url);
+            const isTeraBox = isTeraboxLink(url);
             const ytId = parseYouTubeUrl(url);
             const isEmbedLink = url.includes('/e/') || url.includes('/embed/') || url.includes('tpead.net') || url.includes('drive.google.com');
 
             if (isTeraBox) {
+                let finalUrl = cleanTeraboxUrl(url);
                 mediaArea.innerHTML = `
                     <div class="terabox-container">
                         <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #fff;">TeraBox Stream Ready</p>
-                        <a href="${url}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
-                            ▶ Watch / Play Video (New Tab)
+                        <a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="terabox-btn">
+                            ▶ Open & Watch on TeraBox (New Tab)
                         </a>
-                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to open and play directly on TeraBox</span>
+                        <span style="font-size: 13px; color: #9ca3af; margin-top: 12px;">Click to view and stream directly on TeraBox</span>
                     </div>
                 `;
                 if (controlsBox) controlsBox.style.display = 'none';
@@ -357,12 +388,11 @@
             }
         }
 
-        // Process Seasons & Episodes dynamically from admin inputs
+        // Process Seasons & Episodes dynamically
         document.addEventListener('DOMContentLoaded', () => {
             const episodes = movieData.episodes || [];
             if (episodes.length === 0) return;
 
-            // Group episodes by season number
             const seasonsMap = {};
             episodes.forEach((ep, index) => {
                 let sNum = ep.season || ep.seasonNumber || ep.seasonNo || ep.s || 1;
@@ -395,7 +425,6 @@
                 });
             }
 
-            // Show Seasons if there is more than 1 season
             if (seasonKeys.length > 1) {
                 seasonsContainer.style.display = 'block';
                 seasonButtonsBox.innerHTML = '';
@@ -414,7 +443,6 @@
                 });
             }
 
-            // Initially render Season 1 episodes
             renderEpisodes(seasonKeys[0]);
         });
 
