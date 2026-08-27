@@ -2,65 +2,204 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body class="bg-gray-900 text-white p-6">
-  <div class="max-w-5xl mx-auto space-y-6">
-    <h1 class="text-3xl font-bold border-b border-gray-700 pb-2">Admin Dashboard</h1>
+  <div class="max-w-6xl mx-auto space-y-8">
+    
+    <div class="flex justify-between items-center border-b border-gray-700 pb-4">
+      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+      <a href="/logout" class="bg-red-600 px-4 py-2 rounded text-sm font-semibold">Logout</a>
+    </div>
 
-    <form action="/admin/save" method="POST" enctype="multipart/form-data" class="bg-gray-800 p-4 rounded space-y-4">
-      <% if (movieToEdit) { %><input type="hidden" name="id" value="<%= movieToEdit._id %>"><% } %>
-      <div class="grid grid-cols-2 gap-4">
-        <input type="text" name="title" value="<%= movieToEdit ? movieToEdit.title : '' %>" placeholder="Title" required class="p-2 bg-gray-700 rounded">
-        <select name="contentType" class="p-2 bg-gray-700 rounded">
-          <option value="movie" <%= movieToEdit && movieToEdit.contentType==='movie'?'selected':'' %>>Movie</option>
-          <option value="series" <%= movieToEdit && movieToEdit.contentType==='series'?'selected':'' %>>Series</option>
-        </select>
-      </div>
+    <% if (msg) { %><div class="bg-green-600 p-3 rounded"><%= msg %></div><% } %>
+    <% if (err) { %><div class="bg-red-600 p-3 rounded"><%= err %></div><% } %>
 
-      <div class="grid grid-cols-2 gap-4">
-        <select name="category" class="p-2 bg-gray-700 rounded">
-          <% categories.forEach(c => { %>
-            <option value="<%= c %>" <%= movieToEdit && movieToEdit.category===c?'selected':'' %>><%= c %></option>
-          <% }) %>
-        </select>
-        <input type="text" name="posterUrl" value="<%= movieToEdit ? movieToEdit.poster : '' %>" placeholder="Poster URL" class="p-2 bg-gray-700 rounded">
-      </div>
+    <!-- Add/Edit Form -->
+    <div class="bg-gray-800 p-6 rounded-lg space-y-4">
+      <h2 class="text-xl font-bold"><%= movieToEdit ? 'Edit Content' : 'Add New Content' %></h2>
+      <form action="/admin/save" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <% if (movieToEdit) { %>
+          <input type="hidden" name="id" value="<%= movieToEdit._id %>">
+        <% } %>
 
-      <div>
-        <label><input type="checkbox" name="isPinned" <%= movieToEdit && movieToEdit.isPinned?'checked':'' %>> Pin to top</label>
-      </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1 text-sm">Title</label>
+            <input type="text" name="title" value="<%= movieToEdit ? movieToEdit.title : '' %>" required class="w-full p-2 bg-gray-700 rounded">
+          </div>
+          <div>
+            <label class="block mb-1 text-sm">Content Type</label>
+            <select name="contentType" id="typeSelect" onchange="toggleTypeSections()" class="w-full p-2 bg-gray-700 rounded">
+              <option value="movie" <%= movieToEdit && movieToEdit.contentType==='movie'?'selected':'' %>>Movie</option>
+              <option value="series" <%= movieToEdit && movieToEdit.contentType==='series'?'selected':'' %>>Series</option>
+            </select>
+          </div>
+        </div>
 
-      <div class="flex gap-2">
-        <input type="text" name="linkName" placeholder="Server Name" class="p-2 bg-gray-700 rounded w-1/3">
-        <input type="text" name="linkUrl" placeholder="Video Link" class="p-2 bg-gray-700 rounded w-2/3">
-      </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-1 text-sm">Category</label>
+            <select name="category" class="w-full p-2 bg-gray-700 rounded">
+              <% categories.forEach(c => { %>
+                <option value="<%= c %>" <%= movieToEdit && movieToEdit.category===c?'selected':'' %>><%= c %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-1 text-sm">Poster Image (URL / File Upload)</label>
+            <input type="text" name="posterUrl" value="<%= movieToEdit ? movieToEdit.poster : '' %>" placeholder="Image URL" class="w-full p-2 mb-2 bg-gray-700 rounded">
+            <input type="file" name="posterFile" class="w-full text-sm">
+          </div>
+        </div>
 
-      <button type="submit" class="bg-blue-600 px-4 py-2 rounded">Save</button>
-    </form>
+        <div>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" name="isPinned" <%= movieToEdit && movieToEdit.isPinned?'checked':'' %> class="w-4 h-4">
+            <span class="ml-2">Pin to Top</span>
+          </label>
+        </div>
 
-    <div class="bg-gray-800 p-4 rounded">
-      <h2 class="font-bold mb-2">Add Category</h2>
-      <form action="/admin/add-category" method="POST" class="flex gap-2">
-        <input type="text" name="categoryName" placeholder="Category Name" required class="p-2 bg-gray-700 rounded">
-        <button type="submit" class="bg-green-600 px-4 py-2 rounded">Add</button>
+        <!-- Dynamic Links for Movies -->
+        <div id="movieSection" class="border border-gray-700 p-4 rounded space-y-2">
+          <h3 class="font-bold">Movie Stream Links</h3>
+          <div id="movieLinks">
+            <% if (movieToEdit && movieToEdit.contentType === 'movie' && movieToEdit.videoLinks.length) { %>
+              <% movieToEdit.videoLinks.forEach(link => { %>
+                <div class="flex gap-2 mb-2">
+                  <input type="text" name="linkName" value="<%= link.name %>" placeholder="Server Name" class="p-2 bg-gray-700 rounded w-1/3">
+                  <input type="text" name="linkUrl" value="<%= link.url %>" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/3">
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="flex gap-2 mb-2">
+                <input type="text" name="linkName" placeholder="Server Name (e.g. Server 1)" class="p-2 bg-gray-700 rounded w-1/3">
+                <input type="text" name="linkUrl" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/3">
+              </div>
+            <% } %>
+          </div>
+          <button type="button" onclick="addMovieLink()" class="bg-gray-700 px-3 py-1 rounded text-sm">+ Add Link</button>
+        </div>
+
+        <!-- Dynamic Links for Series -->
+        <div id="seriesSection" class="border border-gray-700 p-4 rounded space-y-2 hidden">
+          <h3 class="font-bold">Episodes</h3>
+          <div id="seriesEpisodes">
+            <% if (movieToEdit && movieToEdit.contentType === 'series' && movieToEdit.episodes.length) { %>
+              <% movieToEdit.episodes.forEach(ep => { %>
+                <div class="flex gap-2 mb-2">
+                  <input type="number" name="epSeason" value="<%= ep.season %>" placeholder="Season" class="p-2 bg-gray-700 rounded w-1/6">
+                  <input type="number" name="epNum" value="<%= ep.episodeNumber %>" placeholder="Ep No" class="p-2 bg-gray-700 rounded w-1/6">
+                  <input type="text" name="epName" value="<%= ep.name %>" placeholder="Episode Title" class="p-2 bg-gray-700 rounded w-2/6">
+                  <input type="text" name="epUrl" value="<%= ep.url %>" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/6">
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="flex gap-2 mb-2">
+                <input type="number" name="epSeason" placeholder="Season" class="p-2 bg-gray-700 rounded w-1/6">
+                <input type="number" name="epNum" placeholder="Ep No" class="p-2 bg-gray-700 rounded w-1/6">
+                <input type="text" name="epName" placeholder="Episode Title" class="p-2 bg-gray-700 rounded w-2/6">
+                <input type="text" name="epUrl" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/6">
+              </div>
+            <% } %>
+          </div>
+          <button type="button" onclick="addSeriesEpisode()" class="bg-gray-700 px-3 py-1 rounded text-sm">+ Add Episode</button>
+        </div>
+
+        <button type="submit" class="bg-blue-600 px-6 py-2 rounded font-bold">Save Content</button>
       </form>
     </div>
 
-    <div class="bg-gray-800 p-4 rounded">
-      <h2 class="font-bold mb-2">All Movies</h2>
-      <% movies.forEach(m => { %>
-        <div class="flex justify-between items-center border-b border-gray-700 py-2">
-          <span><%= m.title %> (<%= m.category %>)</span>
-          <div class="flex gap-2">
-            <form action="/admin/toggle-pin/<%= m._id %>" method="POST"><button class="<%= m.isPinned?'text-yellow-400':'text-gray-500' %>">★</button></form>
-            <a href="/admin?edit=<%= m._id %>" class="bg-yellow-600 px-2 py-1 rounded text-sm">Edit</a>
-            <form action="/admin/delete/<%= m._id %>" method="POST"><button class="bg-red-600 px-2 py-1 rounded text-sm">Delete</button></form>
+    <!-- Category Manager -->
+    <div class="bg-gray-800 p-6 rounded-lg space-y-4">
+      <h2 class="text-xl font-bold">Manage Categories</h2>
+      <form action="/admin/add-category" method="POST" class="flex gap-2">
+        <input type="text" name="categoryName" placeholder="Category Name" required class="p-2 bg-gray-700 rounded flex-1">
+        <button type="submit" class="bg-green-600 px-4 py-2 rounded font-semibold">Add Category</button>
+      </form>
+      <div class="flex flex-wrap gap-2 pt-2">
+        <% categories.forEach(cat => { %>
+          <div class="bg-gray-700 px-3 py-1 rounded flex items-center gap-2">
+            <span><%= cat %></span>
+            <form action="/admin/delete-category" method="POST" class="inline">
+              <input type="hidden" name="categoryName" value="<%= cat %>">
+              <button class="text-red-400 font-bold hover:text-red-600">×</button>
+            </form>
           </div>
-        </div>
-      <% }) %>
+        <% }) %>
+      </div>
     </div>
+
+    <!-- Content Table -->
+    <div class="bg-gray-800 p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4">Content List</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-gray-700">
+              <th class="p-2">Title</th>
+              <th class="p-2">Type</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">Pin</th>
+              <th class="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% movies.forEach(m => { %>
+              <tr class="border-b border-gray-700">
+                <td class="p-2"><%= m.title %></td>
+                <td class="p-2 capitalize"><%= m.contentType %></td>
+                <td class="p-2"><%= m.category %></td>
+                <td class="p-2">
+                  <form action="/admin/toggle-pin/<%= m._id %>" method="POST" class="inline">
+                    <button class="<%= m.isPinned ? 'text-yellow-400 font-bold' : 'text-gray-500' %>">★</button>
+                  </form>
+                </td>
+                <td class="p-2 space-x-2">
+                  <a href="/admin?edit=<%= m._id %>" class="bg-yellow-600 px-2 py-1 rounded text-xs font-semibold">Edit</a>
+                  <form action="/admin/delete/<%= m._id %>" method="POST" class="inline">
+                    <button class="bg-red-600 px-2 py-1 rounded text-xs font-semibold">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
+
+  <script>
+    function toggleTypeSections() {
+      const type = document.getElementById('typeSelect').value;
+      if (type === 'movie') {
+        document.getElementById('movieSection').classList.remove('hidden');
+        document.getElementById('seriesSection').classList.add('hidden');
+      } else {
+        document.getElementById('movieSection').classList.add('hidden');
+        document.getElementById('seriesSection').classList.remove('hidden');
+      }
+    }
+    toggleTypeSections();
+
+    function addMovieLink() {
+      const container = document.getElementById('movieLinks');
+      const div = document.createElement('div');
+      div.className = 'flex gap-2 mb-2';
+      div.innerHTML = `<input type="text" name="linkName" placeholder="Server Name" class="p-2 bg-gray-700 rounded w-1/3"><input type="text" name="linkUrl" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/3">`;
+      container.appendChild(div);
+    }
+
+    function addSeriesEpisode() {
+      const container = document.getElementById('seriesEpisodes');
+      const div = document.createElement('div');
+      div.className = 'flex gap-2 mb-2';
+      div.innerHTML = `<input type="number" name="epSeason" placeholder="Season" class="p-2 bg-gray-700 rounded w-1/6"><input type="number" name="epNum" placeholder="Ep No" class="p-2 bg-gray-700 rounded w-1/6"><input type="text" name="epName" placeholder="Episode Title" class="p-2 bg-gray-700 rounded w-2/6"><input type="text" name="epUrl" placeholder="Stream URL" class="p-2 bg-gray-700 rounded w-2/6">`;
+      container.appendChild(div);
+    }
+  </script>
 </body>
 </html>
